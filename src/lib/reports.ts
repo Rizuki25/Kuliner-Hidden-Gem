@@ -101,6 +101,9 @@ function mapReport(row: ContentReportRow): ContentReportRecord {
 
 export async function submitContentReport(userId: string, input: ContentReportInput) {
   if (!supabase) return { error: missingSupabaseError() }
+  if (!['place', 'review', 'place_photo'].includes(input.entityType)) return { error: 'Jenis konten yang dilaporkan tidak valid.' }
+  if (!['spam', 'informasi_salah', 'konten_menyinggung', 'tempat_tutup', 'lainnya'].includes(input.reason)) return { error: 'Alasan laporan tidak valid.' }
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(input.entityId)) return { error: 'Konten yang dilaporkan tidak valid.' }
   const details = input.details.trim()
   if (details.length > 1000) return { error: 'Detail laporan maksimal 1.000 karakter.' }
 
@@ -130,7 +133,11 @@ export async function submitContentReport(userId: string, input: ContentReportIn
     .select(reportSelect)
     .single()
 
-  if (error || !data) return { error: error?.message ?? 'Laporan gagal dikirim.' }
+  if (error || !data) {
+    if (error?.code === '23505') return { error: 'Laporan untuk konten ini masih sedang ditinjau.' }
+    if (error?.code === 'P0001') return { error: error.message }
+    return { error: error?.message ?? 'Laporan gagal dikirim.' }
+  }
   return { report: mapReport(data as unknown as ContentReportRow) }
 }
 

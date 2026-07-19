@@ -44,6 +44,7 @@ a { color: inherit; text-decoration: none; }
 .nav-link:hover { color: var(--ink); background: #eee9df; }
 .nav-link.is-active { color: var(--ink); background: #ebe5da; }
 .topbar__actions { display: flex; align-items: center; gap: 16px; }
+.topbar__account { display: flex; align-items: center; gap: 11px; }
 .city-pill { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .02em; }
 .city-pill svg { color: var(--orange); }
 .login-link { display: inline-flex; align-items: center; gap: 7px; padding: 0; border: 0; color: var(--ink); background: transparent; font-size: 13px; font-weight: 700; }
@@ -411,9 +412,34 @@ h1 em, h2 em { color: var(--orange-dark); font-family: 'Playfair Display', serif
 .auth-message--notice { color: #668050; background: #eff4e9; }
 .auth-card__footnote { margin: 23px 0 17px; color: var(--muted); font-size: 11px; text-align: center; }
 .auth-card__footnote a, .auth-toggle { color: var(--orange-dark); font-weight: 700; }
+.auth-forgot { justify-self: end; margin-top: -2px; color: var(--orange-dark); font-size: 10px; font-weight: 700; }
+.auth-forgot:hover { color: var(--ink); }
 .auth-toggle { padding: 0; border: 0; background: transparent; font-size: inherit; }
 .auth-toggle:hover { color: var(--ink); }
 .auth-card .back-link { justify-content: center; width: 100%; }
+
+.profile-page { padding-top: 36px; padding-bottom: 90px; }
+.profile-page__heading { display: flex; align-items: center; gap: 15px; margin: 52px 0 30px; }
+.profile-page__heading h1 { margin: 7px 0 8px; font-size: clamp(43px, 6vw, 66px); line-height: .96; letter-spacing: -.07em; }
+.profile-page__heading p { max-width: 500px; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.profile-page__message { display: flex; align-items: center; gap: 7px; margin: 0 0 18px; }
+.profile-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; }
+.profile-card { display: grid; gap: 19px; padding: 24px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); box-shadow: var(--shadow); }
+.profile-card__heading { display: flex; align-items: flex-start; gap: 11px; }
+.profile-card__heading > svg { flex: 0 0 auto; color: var(--orange); }
+.profile-card__heading > div { display: grid; gap: 4px; }
+.profile-card__heading h2 { margin: 0; color: var(--ink); font-size: 23px; letter-spacing: -.05em; }
+.profile-card__intro { margin: -5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+.profile-meta { display: grid; grid-template-columns: 1fr auto; gap: 9px 15px; padding: 13px; border-radius: 9px; background: #f3efe7; }
+.profile-meta span { color: var(--soft-muted); font-family: 'DM Mono', monospace; font-size: 9px; text-transform: uppercase; }
+.profile-meta strong { display: inline-flex; align-items: center; justify-content: flex-end; gap: 5px; color: var(--ink); font-size: 11px; text-align: right; }
+.profile-meta strong svg { color: #668050; }
+.profile-form { display: grid; gap: 13px; }
+.profile-form label { display: grid; gap: 6px; color: var(--ink); font-size: 11px; font-weight: 700; }
+.profile-form input { width: 100%; min-height: 42px; padding: 0 11px; border: 1px solid var(--line); border-radius: 8px; outline: 0; color: var(--ink); background: #fbf9f4; font-size: 12px; }
+.profile-form input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(221, 109, 67, .1); }
+.profile-form input[readonly] { color: var(--muted); background: #f3efe7; }
+.profile-form .button { margin-top: 3px; width: fit-content; }
 
 .form-page, .admin-page { padding-top: 38px; padding-bottom: 85px; }
 .form-page__heading, .admin-page__heading { max-width: 620px; margin: 54px auto 35px; text-align: center; }
@@ -974,6 +1000,14 @@ h1 em, h2 em { color: var(--orange-dark); font-family: 'Playfair Display', serif
   .centered-page h1, .auth-card h1, .form-page h1, .admin-page h1 { font-size: 43px; }
   .auth-page { width: calc(100% - 30px); padding-top: 35px; }
   .auth-card { padding: 27px 22px; }
+  .topbar__account { gap: 8px; }
+  .topbar__account .login-link span { display: none; }
+  .profile-page { padding-top: 27px; }
+  .profile-page__heading { align-items: flex-start; flex-direction: column; gap: 12px; margin-top: 42px; }
+  .profile-page__heading h1 { font-size: 49px; }
+  .profile-grid { grid-template-columns: 1fr; }
+  .profile-card { padding: 20px; }
+  .profile-form .button { width: 100%; }
   .form-page__heading, .admin-page__heading { margin-top: 42px; }
   .locked-form { padding: 15px; }
   .form-fields-preview { grid-template-columns: 1fr; gap: 14px; margin: 20px 0; }

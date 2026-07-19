@@ -20,6 +20,10 @@ Migration klaim bisnis, bucket bukti kepemilikan, dan policy manager berada di:
 
 `supabase/migrations/202607190003_business_claim_proofs_and_manager_policies.sql`
 
+Migration hardening produksi untuk rate limit, pencegahan laporan duplikat, dan integritas ulasan berada di:
+
+`supabase/migrations/202607190004_hardening_rate_limits_and_rls.sql`
+
 ## Isi schema
 
 | Tabel | Fungsi |
@@ -48,6 +52,9 @@ Migration klaim bisnis, bucket bukti kepemilikan, dan policy manager berada di:
 - Approval klaim bisnis otomatis membuat record `place_managers` dan mengubah role user menjadi `owner`.
 - Bukti klaim bisnis disimpan di bucket private `business-claim-proofs`; folder teratas wajib sama dengan `auth.uid()`, dan admin dapat membuat signed URL untuk meninjaunya.
 - Manager terverifikasi dapat memperbarui data `places`, `place_hours`, dan `place_photos` sesuai policy. UI pengelolaan tersedia di route `/kelola-tempat`.
+- User hanya dapat memperbarui `display_name` dan `avatar_url` pada `profiles`; role tidak dapat diubah melalui frontend.
+- Satu user tidak dapat membuat laporan pending ganda untuk entitas yang sama. Usulan tempat dibatasi lima pengajuan per 24 jam dan laporan dibatasi 30 per 24 jam melalui trigger database.
+- User hanya dapat mengubah isi/rating ulasannya sendiri saat pending; `user_id`, `place_id`, dan metadata moderasi dilindungi oleh policy dan trigger.
 - Foto usulan disimpan di bucket private `place-submission-photos`. Folder teratas wajib sama dengan `auth.uid()`; user hanya dapat membaca foto miliknya, admin dapat membaca semua, dan foto yang sudah dipromosikan ke `place_photos` dapat dibuatkan signed URL untuk publik.
 - Foto pada `place_photos` dengan status approved dan tempat approved dapat dibuatkan signed URL oleh pengunjung tanpa login; foto pending tetap tidak dapat dibaca publik.
 - `halal_status` memiliki nilai `halal`, `non_halal`, dan `belum_terverifikasi`. Nilai ketiga menjaga agar data yang belum diverifikasi tidak dipaksa masuk ke label yang salah.
@@ -78,6 +85,10 @@ where id = '<user_id_dari_auth_users>';
 Panel moderasi frontend tersedia di `/admin`. User dapat melihat riwayat kontribusi di `/kontribusi`.
 
 Jalankan migration klaim bisnis setelah migration foto dan hotfix foto publik. Form klaim tersedia pada halaman detail tempat ketika user sudah login. Admin meninjaunya dari bagian **Klaim bisnis** di `/admin`.
+
+Jalankan migration hardening setelah migration klaim bisnis. Migration ini tidak menghapus data, tetapi pembuatan unique index laporan dapat gagal jika sudah ada laporan pending ganda untuk user dan konten yang sama; selesaikan duplikat tersebut di panel admin lalu jalankan ulang migration.
+
+Fitur pemulihan password tersedia di `/lupa-password` dan mengarahkan email pemulihan ke `/reset-password`. Tambahkan URL tersebut ke daftar redirect URL Supabase Auth jika project sudah memakai domain production.
 
 ## Konfigurasi Google OAuth
 

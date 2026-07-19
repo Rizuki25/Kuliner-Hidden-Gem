@@ -13,6 +13,8 @@ type AuthContextValue = {
   loading: boolean
   signInWithPassword: (email: string, password: string) => Promise<AuthActionResult>
   signUp: (displayName: string, email: string, password: string) => Promise<AuthActionResult>
+  requestPasswordReset: (email: string) => Promise<AuthActionResult>
+  updatePassword: (password: string) => Promise<AuthActionResult>
   signInWithGoogle: () => Promise<AuthActionResult>
   signOut: () => Promise<AuthActionResult>
 }
@@ -60,23 +62,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signInWithPassword: async (email, password) => {
       if (!supabase) return missingSupabaseError()
 
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
       return error ? { error: error.message } : {}
     },
     signUp: async (displayName, email, password) => {
       if (!supabase) return missingSupabaseError()
+      const normalizedDisplayName = displayName.trim()
+      if (normalizedDisplayName.length < 2 || normalizedDisplayName.length > 80) return { error: 'Nama harus berisi 2–80 karakter.' }
+      if (password.length < 8) return { error: 'Kata sandi minimal 8 karakter.' }
 
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: email.trim(),
         password,
         options: {
-          data: { display_name: displayName },
+          data: { display_name: normalizedDisplayName },
           emailRedirectTo: `${window.location.origin}/login`,
         },
       })
 
       if (error) return { error: error.message }
       return { needsEmailConfirmation: !data.session }
+    },
+    requestPasswordReset: async (email) => {
+      if (!supabase) return missingSupabaseError()
+      const normalizedEmail = email.trim()
+      if (!/^\S+@\S+\.\S+$/.test(normalizedEmail)) return { error: 'Masukkan email yang valid.' }
+
+      const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      })
+      return error ? { error: error.message } : {}
+    },
+    updatePassword: async (password) => {
+      if (!supabase) return missingSupabaseError()
+      if (password.length < 8) return { error: 'Kata sandi minimal 8 karakter.' }
+
+      const { error } = await supabase.auth.updateUser({ password })
+      return error ? { error: error.message } : {}
     },
     signInWithGoogle: async () => {
       if (!supabase) return missingSupabaseError()

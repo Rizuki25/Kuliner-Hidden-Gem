@@ -21,7 +21,7 @@ npm.cmd run dev
 ## Status project
 
 - React + Vite + TypeScript sudah disiapkan.
-- Routing tersedia untuk halaman publik, login, favorit, kontribusi, dan admin.
+- Routing tersedia untuk halaman publik, login, pemulihan password, profil, favorit, kontribusi, owner, dan admin.
 - Data publik dan kontribusi terhubung ke Supabase.
 - Peta publik sudah menggunakan Leaflet dan OpenStreetMap.
 - Google OAuth sudah tersedia di frontend, tetapi provider belum diaktifkan.
@@ -32,6 +32,7 @@ npm.cmd run dev
 - Migration foto kontribusi dan policy Storage tersedia di `supabase/migrations/202607180002_contribution_photos.sql`.
 - Hotfix akses foto publik tersedia di `supabase/migrations/202607190001_public_approved_photo_access.sql` dan `supabase/migrations/202607190002_public_approved_photo_policy_definer.sql`.
 - Migration klaim bisnis, bucket bukti kepemilikan, dan policy manager tersedia di `supabase/migrations/202607190003_business_claim_proofs_and_manager_policies.sql`.
+- Migration hardening rate limit dan integritas RLS tersedia di `supabase/migrations/202607190004_hardening_rate_limits_and_rls.sql`.
 - Dokumentasi tabel dan aturan akses tersedia di `supabase/README.md`.
 - `.env.local` digunakan untuk URL project dan publishable key Supabase, serta diabaikan oleh Git.
 - Migration schema dan migration foto sudah dijalankan di project Supabase.
@@ -78,6 +79,9 @@ npm.cmd run dev
 - [x] Approval klaim otomatis memberikan akses manager dan role `owner` melalui trigger Supabase.
 - [x] Menambahkan UI owner di `/kelola-tempat` untuk mengubah deskripsi, kontak, link, jam buka, dan foto tempat terverifikasi.
 - [x] Menambahkan pelaporan konten untuk tempat, ulasan, dan foto, lengkap dengan antrean tindakan di panel admin.
+- [x] Menambahkan pemulihan password melalui email pada `/lupa-password` dan `/reset-password`.
+- [x] Menambahkan pengaturan profil dan ganti password pada `/profil`.
+- [x] Menambahkan hardening database untuk rate limit dasar, laporan pending duplikat, dan integritas ulasan.
 
 ### Verifikasi yang sudah dilakukan
 
@@ -112,10 +116,19 @@ npm.cmd run dev
 ### Verifikasi fitur pelaporan konten
 
 - [x] Form laporan tampil sebagai modal animasi dan tidak mengubah tinggi foto atau layout halaman detail.
-- [ ] User login dapat melaporkan tempat, ulasan publik, dan foto utama dari halaman publik.
-- [ ] Pengiriman laporan ganda untuk konten yang sama ditahan selama laporan sebelumnya masih pending.
-- [ ] Admin melihat laporan pending, mencari laporan, lalu mengabaikan atau menandai laporan sebagai ditindaklanjuti.
-- [ ] Admin dapat mengarsipkan tempat, ulasan, atau foto dari laporan; konten arsip tidak lagi tampil publik.
+- [x] User login dapat melaporkan tempat, ulasan publik, dan foto utama dari halaman publik.
+- [x] Pengiriman laporan ganda untuk konten yang sama ditahan selama laporan sebelumnya masih pending.
+- [x] Admin melihat laporan pending, mencari laporan, lalu mengabaikan atau menandai laporan sebagai ditindaklanjuti.
+- [x] Admin dapat mengarsipkan tempat, ulasan, atau foto dari laporan; konten arsip tidak lagi tampil publik.
+
+### Verifikasi hardening production
+
+- [ ] User meminta pemulihan password dan berhasil membuat password baru dari tautan email.
+- [ ] User memperbarui nama tampilan dan password dari `/profil`.
+- [ ] Role user tidak dapat diubah melalui pengaturan profil; hanya nama tampilan yang dapat diperbarui.
+- [ ] Pengajuan usulan ke-6 dalam periode 24 jam ditolak oleh database dengan pesan batas harian.
+- [ ] Laporan pending ganda untuk user dan konten yang sama ditolak oleh database.
+- [ ] User tidak dapat memindahkan ulasan miliknya ke tempat lain atau mengubah metadata moderasi.
 
 ### Pekerjaan yang ditunda
 
@@ -140,6 +153,9 @@ npm.cmd run dev
 - Tombol `Laporkan` pada halaman detail dan daftar ulasan menyimpan laporan ke `content_reports`; user yang belum login diarahkan ke login terlebih dahulu.
 - Form laporan tampil sebagai modal animasi agar tidak mengubah tinggi foto atau layout halaman detail.
 - Panel admin memuat antrean `content_reports` dan mencatat keputusan laporan pada `moderation_logs`; aksi arsip mengubah status publik konten terkait.
+- Pengaturan akun tersedia di `/profil`; email bersifat read-only, nama tampilan dapat diperbarui, dan password dapat diganti tanpa mengubah role.
+- Pemulihan password mengirim email melalui Supabase Auth dan kembali ke `/reset-password`; URL redirect production perlu didaftarkan di Supabase Dashboard.
+- Validasi kontribusi memeriksa panjang field, URL usaha, koordinat, tipe/ukuran foto, serta batas rate limit database.
 
 ## Integrasi klaim bisnis
 
@@ -149,13 +165,15 @@ npm.cmd run dev
 
 ## Tahap berikutnya
 
-- [x] Fase 6: implementasi pelaporan konten dan antrean laporan admin selesai; checklist fungsional masih menunggu pengujian manual.
-- [ ] Hardening production: validasi spam, audit akses, pemulihan kata sandi, dan pengaturan profil.
+- [x] Fase 6: implementasi pelaporan konten dan antrean laporan admin selesai; seluruh checklist fungsional sudah diuji dan berhasil.
+- [x] Hardening production: implementasi validasi, audit akses, pemulihan password, dan pengaturan profil selesai; checklist manual masih menunggu pengujian.
 - [ ] Konfigurasi Google OAuth setelah kebutuhan deployment/domain sudah siap.
 
 ## Status authentication
 
 - Email/password sudah terhubung melalui Supabase Auth.
+- Pemulihan password tersedia melalui route `/lupa-password` dan `/reset-password`.
+- Pendaftaran akun baru dan password baru menggunakan minimal 8 karakter; password lama tetap dapat digunakan untuk login sebelum diubah.
 - Login Google sudah tersedia melalui `signInWithOAuth({ provider: 'google' })`.
 - Konfigurasi provider Google sengaja ditunda sampai tahap deployment/domain production.
 - Google OAuth tetap membutuhkan konfigurasi manual pada Supabase Dashboard dan Google Cloud. Detailnya ada di `supabase/README.md`.

@@ -268,6 +268,35 @@ export function validateSubmissionPhoto(file: File) {
   return undefined
 }
 
+function isHttpUrl(value: string) {
+  try {
+    const url = new URL(value)
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
+function validateSubmissionInput(input: NewPlaceSubmissionInput) {
+  const name = input.name.trim()
+  const description = input.description.trim()
+  const address = input.address.trim()
+  const area = input.area.trim()
+  const phone = input.phone.trim()
+  const websiteUrl = input.websiteUrl.trim()
+
+  if (name.length < 2 || name.length > 120) return { error: 'Nama tempat harus berisi 2–120 karakter.' }
+  if (address.length < 5 || address.length > 240) return { error: 'Alamat harus berisi 5–240 karakter.' }
+  if (area.length > 120) return { error: 'Area maksimal 120 karakter.' }
+  if (description.length > 2000) return { error: 'Deskripsi maksimal 2.000 karakter.' }
+  if (phone.length > 40) return { error: 'Nomor kontak maksimal 40 karakter.' }
+  if (websiteUrl && !isHttpUrl(websiteUrl)) return { error: 'Link usaha harus menggunakan URL http atau https yang valid.' }
+  if (!Number.isFinite(input.latitude) || input.latitude < -90 || input.latitude > 90) return { error: 'Latitude tidak valid.' }
+  if (!Number.isFinite(input.longitude) || input.longitude < -180 || input.longitude > 180) return { error: 'Longitude tidak valid.' }
+
+  return { value: { name, description, address, area, phone, websiteUrl } }
+}
+
 async function uploadSubmissionPhotos(userId: string, submissionId: string, photos: File[]) {
   if (!supabase || photos.length === 0) return { paths: [] as string[] }
   if (photos.length > MAX_SUBMISSION_PHOTOS) {
@@ -324,27 +353,31 @@ async function uploadSubmissionPhotos(userId: string, submissionId: string, phot
 export async function createPlaceSubmission(userId: string, input: NewPlaceSubmissionInput) {
   if (!supabase) return { error: missingSupabaseError() }
 
+  const validation = validateSubmissionInput(input)
+  if (validation.error || !validation.value) return { error: validation.error }
+
   const { data: submission, error: submissionError } = await supabase
     .from('place_submissions')
     .insert({
       submitted_by: userId,
-      name: input.name.trim(),
+      name: validation.value.name,
       category: input.category,
       price_range: input.priceRange,
       halal_status: input.halalStatus,
-      description: input.description.trim() || null,
-      address: input.address.trim(),
-      area: input.area.trim() || null,
+      description: validation.value.description || null,
+      address: validation.value.address,
+      area: validation.value.area || null,
       latitude: input.latitude,
       longitude: input.longitude,
-      phone: input.phone.trim() || null,
-      website_url: input.websiteUrl.trim() || null,
+      phone: validation.value.phone || null,
+      website_url: validation.value.websiteUrl || null,
       status: 'pending',
     })
     .select('id')
     .single()
 
   if (submissionError || !submission) {
+    if (submissionError?.code === 'P0001') return { error: submissionError.message }
     return { error: submissionError?.message ?? 'Usulan tempat gagal disimpan.' }
   }
 

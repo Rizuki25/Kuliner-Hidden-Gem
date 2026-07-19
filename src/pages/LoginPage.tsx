@@ -79,13 +79,14 @@ export function LoginPage() {
           {mode === 'signup' && (
             <>
               <label htmlFor="display-name">Nama</label>
-              <input id="display-name" type="text" value={displayName} onChange={(event) => setDisplayName(event.target.value)} placeholder="Nama kamu" autoComplete="name" required />
+              <input id="display-name" type="text" value={displayName} onChange={(event) => setDisplayName(event.target.value)} placeholder="Nama kamu" minLength={2} maxLength={80} autoComplete="name" required />
             </>
           )}
           <label htmlFor="email">Email</label>
           <div className="input-with-icon"><Mail size={16} /><input id="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="nama@email.com" autoComplete="email" required /></div>
           <label htmlFor="password">Kata sandi</label>
-          <input id="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Minimal 6 karakter" minLength={6} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} required />
+          <input id="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder={mode === 'signup' ? 'Minimal 8 karakter' : 'Kata sandi kamu'} minLength={mode === 'signup' ? 8 : undefined} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} required />
+          {mode === 'login' && <Link className="auth-forgot" to="/lupa-password">Lupa kata sandi?</Link>}
 
           {error && <div className="auth-message auth-message--error" role="alert">{error}</div>}
           {notice && <div className="auth-message auth-message--notice" role="status">{notice}</div>}

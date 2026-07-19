@@ -44,10 +44,10 @@ export function AppShell() {
           <div className="topbar__actions">
             <span className="city-pill"><MapPin size={14} /> Bandung</span>
             {user ? (
-              <button className="login-link" type="button" onClick={() => void signOut()} title={user.email ?? 'Akun aktif'}>
-                <UserCircle size={16} />
-                <span>Keluar</span>
-              </button>
+              <div className="topbar__account">
+                <NavLink className="login-link" to="/profil" title={user.email ?? 'Buka profil'}><UserCircle size={16} /><span>Profil</span></NavLink>
+                <button className="login-link" type="button" onClick={() => void signOut()} title="Keluar dari akun"><LogOut size={16} /><span>Keluar</span></button>
+              </div>
             ) : (
               <NavLink className="login-link" to="/login">
                 <LogIn size={16} />
