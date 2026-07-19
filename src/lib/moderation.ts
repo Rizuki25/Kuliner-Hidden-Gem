@@ -5,6 +5,7 @@ import {
   type PlaceSubmissionRecord,
   type SubmissionHourInput,
 } from './submissions'
+import { fetchAdminReviews, type ReviewModerationRecord } from './reviews'
 import { supabase } from './supabase'
 
 export type AdminStats = {
@@ -98,17 +99,17 @@ function logModeration(
 }
 
 export async function fetchAdminWorkspace() {
-  if (!supabase) return { submissions: [], stats: undefined, error: missingSupabaseError() }
+  if (!supabase) return { submissions: [], reviews: [], stats: undefined, error: missingSupabaseError() }
 
-  const [submissionResult, pendingReviewsResult, approvedPlacesResult] = await Promise.all([
+  const [submissionResult, reviewsResult, approvedPlacesResult] = await Promise.all([
     fetchAllSubmissions(),
-    supabase.from('reviews').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    fetchAdminReviews(),
     supabase.from('places').select('id', { count: 'exact', head: true }).eq('publication_status', 'approved'),
   ])
 
-  if (pendingReviewsResult.error) return { submissions: [], stats: undefined, error: pendingReviewsResult.error.message }
-  if (approvedPlacesResult.error) return { submissions: [], stats: undefined, error: approvedPlacesResult.error.message }
-  if (submissionResult.error) return { submissions: [], stats: undefined, error: submissionResult.error }
+  if (reviewsResult.error) return { submissions: [], reviews: [], stats: undefined, error: reviewsResult.error }
+  if (approvedPlacesResult.error) return { submissions: [], reviews: [], stats: undefined, error: approvedPlacesResult.error.message }
+  if (submissionResult.error) return { submissions: [], reviews: [], stats: undefined, error: submissionResult.error }
 
   const contributorIds = [...new Set(submissionResult.submissions.map((submission) => submission.submittedBy))]
   const profileMap = new Map<string, string | null>()
@@ -119,7 +120,7 @@ export async function fetchAdminWorkspace() {
       .select('id, display_name')
       .in('id', contributorIds)
 
-    if (profilesError) return { submissions: [], stats: undefined, error: profilesError.message }
+    if (profilesError) return { submissions: [], reviews: [], stats: undefined, error: profilesError.message }
     for (const profile of profiles ?? []) {
       profileMap.set(profile.id as string, (profile.display_name as string | null) ?? null)
     }
@@ -132,9 +133,10 @@ export async function fetchAdminWorkspace() {
 
   return {
     submissions: await attachSubmissionPhotoUrls(submissionsWithContributors),
+    reviews: reviewsResult.reviews,
     stats: {
       pendingSubmissions: submissionsWithContributors.filter((submission) => submission.status === 'pending').length,
-      pendingReviews: pendingReviewsResult.count ?? 0,
+      pendingReviews: reviewsResult.reviews.filter((review) => review.status === 'pending').length,
       approvedPlaces: approvedPlacesResult.count ?? 0,
     } satisfies AdminStats,
   }
@@ -366,4 +368,95 @@ export async function saveSubmissionEdit(
   }
 
   return logModeration(adminId, submission, 'edit', submission.status)
+}
+
+function logReviewModeration(
+  actorId: string,
+  review: ReviewModerationRecord,
+  action: 'approve' | 'reject' | 'archive' | 'restore',
+  toStatus: string,
+  reason?: string,
+) {
+  if (!supabase) return Promise.resolve<ModerationResult>({ error: missingSupabaseError() })
+
+  return supabase.from('moderation_logs').insert({
+    actor_id: actorId,
+    entity_type: 'review',
+    entity_id: review.id,
+    action,
+    from_status: review.status,
+    to_status: toStatus,
+    reason: reason?.trim() || null,
+    metadata: { place_id: review.placeId, rating: review.rating },
+  }).then(({ error }) => error ? { error: error.message } : {})
+}
+
+export async function approveReview(adminId: string, review: ReviewModerationRecord): Promise<ModerationResult> {
+  if (!supabase) return { error: missingSupabaseError() }
+
+  const { error } = await supabase
+    .from('reviews')
+    .update({
+      status: 'approved',
+      moderation_reason: null,
+      moderated_by: adminId,
+      moderated_at: new Date().toISOString(),
+    })
+    .eq('id', review.id)
+
+  if (error) return { error: error.message }
+  return logReviewModeration(adminId, review, 'approve', 'approved')
+}
+
+export async function rejectReview(adminId: string, review: ReviewModerationRecord, reason: string): Promise<ModerationResult> {
+  if (!supabase) return { error: missingSupabaseError() }
+  const cleanReason = reason.trim()
+  if (!cleanReason) return { error: 'Alasan penolakan ulasan wajib diisi.' }
+
+  const { error } = await supabase
+    .from('reviews')
+    .update({
+      status: 'rejected',
+      moderation_reason: cleanReason,
+      moderated_by: adminId,
+      moderated_at: new Date().toISOString(),
+    })
+    .eq('id', review.id)
+
+  if (error) return { error: error.message }
+  return logReviewModeration(adminId, review, 'reject', 'rejected', cleanReason)
+}
+
+export async function archiveReview(adminId: string, review: ReviewModerationRecord): Promise<ModerationResult> {
+  if (!supabase) return { error: missingSupabaseError() }
+
+  const { error } = await supabase
+    .from('reviews')
+    .update({
+      status: 'archived',
+      moderation_reason: null,
+      moderated_by: adminId,
+      moderated_at: new Date().toISOString(),
+    })
+    .eq('id', review.id)
+
+  if (error) return { error: error.message }
+  return logReviewModeration(adminId, review, 'archive', 'archived')
+}
+
+export async function restoreReview(adminId: string, review: ReviewModerationRecord): Promise<ModerationResult> {
+  if (!supabase) return { error: missingSupabaseError() }
+
+  const { error } = await supabase
+    .from('reviews')
+    .update({
+      status: 'pending',
+      moderation_reason: null,
+      moderated_by: null,
+      moderated_at: null,
+    })
+    .eq('id', review.id)
+
+  if (error) return { error: error.message }
+  return logReviewModeration(adminId, review, 'restore', 'pending')
 }

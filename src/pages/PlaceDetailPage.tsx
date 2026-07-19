@@ -1,12 +1,13 @@
 import { ArrowLeft, CalendarDays, Check, Clock3, ExternalLink, Heart, MapPin, Star } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { ReviewsSection } from '../components/ReviewsSection'
 import { useAuth } from '../context/AuthContext'
 import { useFavorites } from '../context/FavoritesContext'
 import { fetchPlaceById } from '../lib/places'
 import type { Place } from '../types/place'
-import { NotFoundPage } from './NotFoundPage'
 import { dayLabels, dayOrder, halalLabels, priceLabels } from '../types/place'
+import { NotFoundPage } from './NotFoundPage'
 
 export function PlaceDetailPage() {
   const { placeId } = useParams()
@@ -18,8 +19,7 @@ export function PlaceDetailPage() {
   const [loadError, setLoadError] = useState<string>()
   const [favoriteError, setFavoriteError] = useState<string>()
 
-  useEffect(() => {
-    let isMounted = true
+  async function loadPlace() {
     setIsLoading(true)
     setPlace(undefined)
     setLoadError(undefined)
@@ -29,23 +29,21 @@ export function PlaceDetailPage() {
       return
     }
 
-    fetchPlaceById(placeId).then((result) => {
-      if (!isMounted) return
-      setPlace(result.place)
-      setLoadError(result.error)
-      setIsLoading(false)
-    })
+    const result = await fetchPlaceById(placeId)
+    setPlace(result.place)
+    setLoadError(result.error)
+    setIsLoading(false)
+  }
 
-    return () => {
-      isMounted = false
-    }
+  useEffect(() => {
+    void loadPlace()
   }, [placeId])
 
   async function handleFavoriteToggle() {
     if (!place) return
 
     if (!user) {
-      navigate(`/login?next=${encodeURIComponent(`/tempat/${place.id}`)}`)
+      navigate('/login?next=' + encodeURIComponent('/tempat/' + place.id))
       return
     }
 
@@ -70,15 +68,15 @@ export function PlaceDetailPage() {
     return <NotFoundPage />
   }
 
-  const routeUrl = `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}`
+  const routeUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + place.lat + ',' + place.lng
 
   return (
     <div className="page-width detail-page">
       <Link className="back-link" to="/"><ArrowLeft size={16} /> Kembali ke jelajah</Link>
 
       <section className="detail-hero">
-        <div className="detail-hero__visual" style={{ background: `linear-gradient(135deg, ${place.accent}, #282522)` }}>
-          {place.photoUrls?.[0] && <img className="detail-hero__photo" src={place.photoUrls[0]} alt={`Foto ${place.name}`} />}
+        <div className="detail-hero__visual" style={{ background: 'linear-gradient(135deg, ' + place.accent + ', #282522)' }}>
+          {place.photoUrls?.[0] && <img className="detail-hero__photo" src={place.photoUrls[0]} alt={'Foto ' + place.name} />}
           {place.photoUrls?.[0] && <span className="detail-hero__photo-wash" aria-hidden="true" />}
           <span className="place-card__noise" />
           {!place.photoUrls?.[0] && <span className="detail-hero__emoji" aria-hidden="true">{place.emoji}</span>}
@@ -89,7 +87,7 @@ export function PlaceDetailPage() {
           <h1>{place.name}</h1>
           <p className="detail-hero__tagline">{place.tagline}</p>
           <div className="detail-badges">
-            <span className={`status-pill ${place.isOpen ? 'status-pill--open' : 'status-pill--closed'}`}>
+            <span className={'status-pill ' + (place.isOpen ? 'status-pill--open' : 'status-pill--closed')}>
               <span /> {place.isOpen ? 'Buka sekarang' : 'Tutup sekarang'}
             </span>
             <span className="label-pill">{halalLabels[place.halalStatus]}</span>
@@ -100,7 +98,7 @@ export function PlaceDetailPage() {
               <ExternalLink size={16} /> Dapatkan rute
             </a>
             <button
-              className={`button button--secondary favorite-button${isFavorite(place.id) ? ' is-saved' : ''}`}
+              className={'button button--secondary favorite-button' + (isFavorite(place.id) ? ' is-saved' : '')}
               type="button"
               onClick={() => void handleFavoriteToggle()}
               disabled={favoritesLoading}
@@ -118,7 +116,7 @@ export function PlaceDetailPage() {
           <div className="detail-card detail-card--rating">
             <div className="rating-big"><Star size={20} fill="currentColor" /> <strong>{place.rating}</strong><span>/ 5</span></div>
             <div className="rating-copy"><strong>Disukai pengunjung</strong><span>{place.reviewCount} ulasan komunitas</span></div>
-            <Link className="text-link" to="/login">Tulis ulasan ↗</Link>
+            <a className="text-link" href="#ulasan-komunitas">Tulis ulasan ↗</a>
           </div>
 
           <div className="detail-card">
@@ -129,10 +127,7 @@ export function PlaceDetailPage() {
             </div>
           </div>
 
-          <div className="detail-card">
-            <div className="detail-card__heading"><span className="section-kicker">ULASAN KOMUNITAS</span><h2>Cerita dari pengunjung</h2></div>
-            <div className="review-placeholder"><span>“</span><p>Ulasan komunitas akan hadir setelah fitur kontribusi dihubungkan.</p></div>
-          </div>
+          <ReviewsSection placeId={place.id} onChanged={() => void loadPlace()} />
         </div>
 
         <aside className="detail-side-column">
@@ -151,7 +146,7 @@ export function PlaceDetailPage() {
                 return (
                   <div className="hours-row" key={day}>
                     <span>{dayLabels[day]}</span>
-                    <strong>{hours.closed ? 'Tutup' : `${hours.open} – ${hours.close}`}</strong>
+                    <strong>{hours.closed ? 'Tutup' : hours.open + ' – ' + hours.close}</strong>
                   </div>
                 )
               })}

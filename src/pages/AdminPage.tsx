@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import { FormEvent, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ReviewModerationPanel } from '../components/ReviewModerationPanel'
 import { useAuth } from '../context/AuthContext'
 import {
   approveSubmission,
@@ -30,6 +31,7 @@ import {
   type SubmissionEditInput,
 } from '../lib/moderation'
 import { supabase } from '../lib/supabase'
+import type { ReviewModerationRecord } from '../lib/reviews'
 import {
   type PlaceSubmissionRecord,
   type SubmissionStatus,
@@ -171,6 +173,7 @@ export function AdminPage() {
   const [role, setRole] = useState<string>()
   const [roleLoading, setRoleLoading] = useState(true)
   const [submissions, setSubmissions] = useState<PlaceSubmissionRecord[]>([])
+  const [reviews, setReviews] = useState<ReviewModerationRecord[]>([])
   const [stats, setStats] = useState<{ pendingSubmissions: number; pendingReviews: number; approvedPlaces: number }>()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string>()
@@ -214,9 +217,11 @@ export function AdminPage() {
     if (result.error) {
       setError(result.error)
       setSubmissions([])
+      setReviews([])
       setStats(undefined)
     } else {
       setSubmissions(result.submissions)
+      setReviews(result.reviews)
       setStats(result.stats)
     }
     setIsLoading(false)
@@ -393,6 +398,7 @@ export function AdminPage() {
           </div>
         )}
       </section>
+      <ReviewModerationPanel reviews={reviews} isLoading={isLoading} onRefresh={loadWorkspace} onError={setError} />
     </div>
   )
 }

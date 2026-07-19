@@ -66,6 +66,9 @@ npm.cmd run dev
 - [x] Menampilkan foto `place_photos` yang approved pada kartu beranda, favorit, dan halaman detail melalui signed URL.
 - [x] Mengganti pratinjau visual dengan peta interaktif Leaflet/OpenStreetMap menggunakan koordinat tempat, marker, zoom, tooltip, dan lokasi pengguna.
 - [x] Menambahkan geocoding alamat pada form usulan dengan hasil pencarian Nominatim serta pin peta yang dapat dipilih lewat klik dan digeser untuk koreksi manual.
+- [x] Menambahkan rating bintang dan form ulasan komunitas pada halaman detail tempat.
+- [x] Menampilkan ulasan approved serta menyediakan edit dan hapus ulasan milik user.
+- [x] Menambahkan antrean moderasi ulasan di panel admin untuk approve, reject, archive, dan restore.
 
 ### Verifikasi yang sudah dilakukan
 
@@ -73,6 +76,14 @@ npm.cmd run dev
 2. [x] Menjalankan migration `supabase/migrations/202607180002_contribution_photos.sql` di project Supabase.
 3. [x] Mengatur minimal satu akun admin dengan role `admin` melalui SQL Editor.
 4. [x] Menguji peta asli dan marker tempat dari koordinat Supabase.
+
+### Verifikasi fitur rating dan ulasan
+
+- [ ] User mengirim rating dan ulasan baru dari halaman detail.
+- [ ] Ulasan pending tidak tampil publik sebelum disetujui admin.
+- [ ] Admin approve, reject, archive, dan restore ulasan.
+- [ ] User dapat mengedit atau menghapus ulasannya sendiri.
+- [ ] Rating rata-rata dan jumlah ulasan berubah setelah approval atau penghapusan.
 
 ### Pekerjaan yang ditunda
 
@@ -91,6 +102,8 @@ npm.cmd run dev
 - Foto approved pada katalog publik diambil dari bucket private melalui signed URL; foto pending tetap tidak ditampilkan ke pengunjung.
 - Peta menggunakan Leaflet dengan tile OpenStreetMap dan tidak memerlukan Google Maps API key.
 - Form usulan menyediakan tombol pencarian alamat berbasis Nominatim; user tetap memilih hasil yang sesuai atau mengeklik peta untuk menempatkan pin sebelum mengirim.
+- Halaman detail menyediakan rating 1–5, ulasan pending milik user, daftar ulasan approved, serta edit/hapus ulasan sendiri.
+- Panel admin memuat antrean ulasan dari tabel `reviews`; perubahan status memicu perhitungan ulang `places.rating` dan `places.review_count` melalui trigger database.
 
 ## Status authentication
 
