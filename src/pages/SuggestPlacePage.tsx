@@ -1,7 +1,8 @@
-import { ArrowLeft, CheckCircle2, ImagePlus, LoaderCircle, MapPin, Plus, Search, X } from 'lucide-react'
+import { ArrowLeft, ImagePlus, LoaderCircle, MapPin, Plus, Search, X } from 'lucide-react'
 import { FormEvent, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { LocationPicker } from '../components/LocationPicker'
+import { SuccessPopup } from '../components/SuccessPopup'
 import { useAuth } from '../context/AuthContext'
 import { searchAddress, type GeocodingResult } from '../lib/geocoding'
 import {
@@ -202,24 +203,9 @@ export function SuggestPlacePage() {
     )
   }
 
-  if (submitted) {
-    return (
-      <div className="page-width centered-page suggest-success">
-        <div className="centered-page__icon centered-page__icon--success"><CheckCircle2 size={25} /></div>
-        <span className="section-kicker">Usulan terkirim</span>
-        <h1>Terima kasih sudah berbagi temuan</h1>
-        <p>Usulanmu sudah masuk dan akan ditinjau admin. Tempat baru akan tampil setelah disetujui.</p>
-        <div className="centered-page__actions">
-          <Link className="button button--primary" to="/">Kembali menjelajah</Link>
-          <Link className="button button--secondary" to="/kontribusi">Lihat riwayat kontribusi</Link>
-          <button className="button button--secondary" type="button" onClick={() => { setSubmitted(false); navigate('/usulkan-tempat') }}>Usulkan tempat lain</button>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="page-width form-page">
+    <>
+      <div className="page-width form-page">
       <Link className="back-link" to="/"><ArrowLeft size={16} /> Kembali ke jelajah</Link>
       <div className="form-page__heading">
         <div className="centered-page__icon"><Plus size={24} /></div>
@@ -322,6 +308,13 @@ export function SuggestPlacePage() {
         {error && <div className="data-notice data-notice--error" role="alert">{error}</div>}
         <div className="submission-form__footer"><span>* wajib diisi · Usulan akan berstatus pending sampai ditinjau admin.</span><button className="button button--primary" type="submit" disabled={isSubmitting}>{isSubmitting ? <LoaderCircle size={16} className="spin" /> : <Plus size={16} />} {isSubmitting ? 'Mengirim...' : 'Kirim usulan'}</button></div>
       </form>
-    </div>
+      </div>
+      <SuccessPopup
+        isOpen={submitted}
+        title={photos.length > 0 ? 'Upload Berhasil!' : 'Usulan Berhasil!'}
+        message="Usulanmu sudah masuk dan akan ditinjau admin. Tempat baru akan tampil setelah disetujui."
+        onClose={() => navigate('/kontribusi')}
+      />
+    </>
   )
 }

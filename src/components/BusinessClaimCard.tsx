@@ -1,6 +1,7 @@
 import { BriefcaseBusiness, FileCheck2, Link as LinkIcon, LoaderCircle, ShieldCheck, Upload } from 'lucide-react'
 import { FormEvent, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { SuccessPopup } from './SuccessPopup'
 import { useAuth } from '../context/AuthContext'
 import {
   BUSINESS_CLAIM_PROOF_TYPES,
@@ -37,7 +38,7 @@ export function BusinessClaimCard({ placeId }: BusinessClaimCardProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string>()
-  const [notice, setNotice] = useState<string>()
+  const [isUploadSuccessOpen, setIsUploadSuccessOpen] = useState(false)
   const [contactName, setContactName] = useState('')
   const [contactPhone, setContactPhone] = useState('')
   const [contactEmail, setContactEmail] = useState(user?.email ?? '')
@@ -75,7 +76,6 @@ export function BusinessClaimCard({ placeId }: BusinessClaimCardProps) {
 
     setIsSaving(true)
     setError(undefined)
-    setNotice(undefined)
     const input: BusinessClaimInput = { contactName, contactPhone, contactEmail, notes }
     const result = await submitBusinessClaim(user.id, placeId, input, proof)
     if (result.error) {
@@ -84,13 +84,13 @@ export function BusinessClaimCard({ placeId }: BusinessClaimCardProps) {
       return
     }
 
-    setNotice('Pengajuan klaim berhasil dikirim dan menunggu verifikasi admin.')
     setContactName('')
     setContactPhone('')
     setNotes('')
     setProof(undefined)
     await loadClaim()
     setIsSaving(false)
+    setIsUploadSuccessOpen(true)
   }
 
   if (!user) {
@@ -115,7 +115,6 @@ export function BusinessClaimCard({ placeId }: BusinessClaimCardProps) {
       ) : claim ? <ClaimStatus claim={claim} /> : null}
 
       {error && <div className="data-notice data-notice--error business-claim-card__message" role="alert">{error}</div>}
-      {notice && <div className="data-notice business-claim-card__message" role="status">{notice}</div>}
 
       {!isManager && claim?.status !== 'pending' && claim?.status !== 'approved' && (
         <form className="business-claim-card__form" onSubmit={(event) => void handleSubmit(event)}>
@@ -132,6 +131,12 @@ export function BusinessClaimCard({ placeId }: BusinessClaimCardProps) {
       )}
 
       {claim?.status === 'approved' && !isManager && <div className="business-claim-card__notice"><LinkIcon size={15} /> Klaim sudah disetujui, tetapi status pengelola belum terbaca. Segarkan halaman atau hubungi admin.</div>}
+      <SuccessPopup
+        isOpen={isUploadSuccessOpen}
+        title="Upload Berhasil!"
+        message="Bukti kepemilikan berhasil diunggah. Pengajuan klaim kini menunggu verifikasi admin."
+        onClose={() => setIsUploadSuccessOpen(false)}
+      />
     </section>
   )
 }

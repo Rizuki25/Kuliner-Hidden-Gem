@@ -1,6 +1,7 @@
 import { ArrowLeft, Check, CheckCircle2, ExternalLink, Image, ImagePlus, Instagram, LoaderCircle, MapPin, Save, ShieldCheck, Trash2, Upload } from 'lucide-react'
 import { FormEvent, useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { SuccessPopup } from '../components/SuccessPopup'
 import { useAuth } from '../context/AuthContext'
 import {
   deleteOwnedPhoto,
@@ -45,12 +46,14 @@ function OwnerPlaceEditor({ place, userId, onRefresh }: { place: OwnerPlaceRecor
   const [busyPhotoId, setBusyPhotoId] = useState<string>()
   const [error, setError] = useState<string>()
   const [notice, setNotice] = useState<string>()
+  const [isUploadSuccessOpen, setIsUploadSuccessOpen] = useState(false)
 
   useEffect(() => {
     setForm(createEditState(place))
     setNewPhotos([])
     setError(undefined)
     setNotice(undefined)
+    setIsUploadSuccessOpen(false)
   }, [place.id])
 
   function updateField<Key extends keyof OwnerEditState>(key: Key, value: OwnerEditState[Key]) {
@@ -119,9 +122,9 @@ function OwnerPlaceEditor({ place, userId, onRefresh }: { place: OwnerPlaceRecor
       return
     }
     setNewPhotos([])
-    setNotice('Foto berhasil ditambahkan ke tempat publik.')
     await onRefresh()
     setIsUploading(false)
+    setIsUploadSuccessOpen(true)
   }
 
   async function handleDeletePhoto(photo: OwnerPhotoRecord) {
@@ -207,6 +210,12 @@ function OwnerPlaceEditor({ place, userId, onRefresh }: { place: OwnerPlaceRecor
           </article>
         })}</div>}
       </section>
+      <SuccessPopup
+        isOpen={isUploadSuccessOpen}
+        title="Upload Berhasil!"
+        message="Foto berhasil ditambahkan ke tempat publik."
+        onClose={() => setIsUploadSuccessOpen(false)}
+      />
     </article>
   )
 }
@@ -220,9 +229,9 @@ export function OwnerManagementPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string>()
 
-  async function loadPlaces() {
+  async function loadPlaces(showLoading = true) {
     if (!user) return
-    setIsLoading(true)
+    if (showLoading) setIsLoading(true)
     setError(undefined)
     const result = await fetchOwnedPlaces(user.id)
     if (result.error) {
@@ -257,5 +266,5 @@ export function OwnerManagementPage() {
 
   if (places.length === 0) return <div className="page-width centered-page"><div className="centered-page__icon"><ShieldCheck size={24} /></div><span className="section-kicker">RUANG OWNER</span><h1>Belum ada tempat<br /><em>yang terverifikasi.</em></h1><p>Ajukan klaim dari halaman detail tempat. Setelah admin menyetujui, tempat akan muncul di ruang pengelolaan ini.</p><div className="centered-page__actions"><Link className="button button--primary" to="/"><MapPin size={15} /> Cari tempat</Link><Link className="back-link" to="/"><ArrowLeft size={15} /> Kembali ke jelajah</Link></div></div>
 
-  return <div className="page-width owner-page"><Link className="back-link" to="/"><ArrowLeft size={16} /> Kembali ke jelajah</Link><div className="owner-page__heading"><div><span className="section-kicker">RUANG OWNER</span><h1>Rawat tempat<br /><em>yang kamu kelola.</em></h1><p>Perbarui informasi, jam operasional, dan foto untuk membantu pengunjung mendapat informasi terbaru.</p></div><div className="owner-page__badge"><ShieldCheck size={18} /><span>Pemilik terverifikasi<br /><strong>{places.length} tempat</strong></span></div></div>{places.length > 1 && <div className="owner-place-tabs" role="tablist" aria-label="Pilih tempat yang dikelola">{places.map((place) => <button key={place.id} className={selectedPlaceId === place.id ? 'is-active' : ''} type="button" onClick={() => setSelectedPlaceId(place.id)}>{place.name}<small>{place.area || 'Bandung'}</small></button>)}</div>}{selectedPlace && <OwnerPlaceEditor key={selectedPlace.id} place={selectedPlace} userId={user.id} onRefresh={loadPlaces} />}</div>
+  return <div className="page-width owner-page"><Link className="back-link" to="/"><ArrowLeft size={16} /> Kembali ke jelajah</Link><div className="owner-page__heading"><div><span className="section-kicker">RUANG OWNER</span><h1>Rawat tempat<br /><em>yang kamu kelola.</em></h1><p>Perbarui informasi, jam operasional, dan foto untuk membantu pengunjung mendapat informasi terbaru.</p></div><div className="owner-page__badge"><ShieldCheck size={18} /><span>Pemilik terverifikasi<br /><strong>{places.length} tempat</strong></span></div></div>{places.length > 1 && <div className="owner-place-tabs" role="tablist" aria-label="Pilih tempat yang dikelola">{places.map((place) => <button key={place.id} className={selectedPlaceId === place.id ? 'is-active' : ''} type="button" onClick={() => setSelectedPlaceId(place.id)}>{place.name}<small>{place.area || 'Bandung'}</small></button>)}</div>}{selectedPlace && <OwnerPlaceEditor key={selectedPlace.id} place={selectedPlace} userId={user.id} onRefresh={() => loadPlaces(false)} />}</div>
 }

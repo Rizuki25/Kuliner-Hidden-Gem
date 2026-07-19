@@ -1,6 +1,7 @@
 import { Compass, Heart, LogIn, LogOut, MapPin, Plus, UserCircle, Utensils } from 'lucide-react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { InteractiveBackground } from './InteractiveBackground'
 
 const navItems = [
   { label: 'Jelajah', to: '/', icon: Compass, end: true },
@@ -13,11 +14,13 @@ export function AppShell() {
   const isAdmin = location.pathname.startsWith('/admin')
   const isHome = location.pathname === '/'
   const isPlaceDetail = location.pathname.startsWith('/tempat/')
+  const prefersQuietBackground = ['/login', '/lupa-password', '/reset-password', '/profil', '/usulkan-tempat', '/admin', '/kelola-tempat'].some((path) => location.pathname.startsWith(path))
   const usesMarketplaceTheme = isHome || isPlaceDetail || location.pathname === '/favorit' || location.pathname === '/kontribusi' || location.pathname === '/usulkan-tempat' || isAdmin
   const { user, signOut } = useAuth()
 
   return (
-    <div className={`app-shell${usesMarketplaceTheme ? ' app-shell--airbnb' : ''}${isHome ? ' app-shell--home' : ''}`}>
+    <div className={`app-shell${usesMarketplaceTheme ? ' app-shell--airbnb' : ''}${isHome ? ' app-shell--home' : ''}${prefersQuietBackground ? ' app-shell--quiet-background' : ''}`}>
+      <InteractiveBackground />
       <header className="topbar">
         <div className="topbar__inner page-width">
           <NavLink className="brand" to="/" aria-label="Kuliner Tersembunyi, halaman utama">
