@@ -18,20 +18,21 @@ npm.cmd install
 npm.cmd run dev
 ```
 
-## Status tahap 1
+## Status project
 
 - React + Vite + TypeScript sudah disiapkan.
-- Routing dasar untuk halaman publik, login, favorit, kontribusi, dan admin tersedia.
-- Halaman jelajah menggunakan data contoh lokal agar alur UI dapat diuji sebelum database dan Maps API dihubungkan.
-- Peta saat ini berupa pratinjau visual; integrasi provider peta dilakukan pada tahap berikutnya.
+- Routing tersedia untuk halaman publik, login, favorit, kontribusi, dan admin.
+- Data publik dan kontribusi terhubung ke Supabase.
+- Peta publik sudah menggunakan Leaflet dan OpenStreetMap.
+- Google OAuth sudah tersedia di frontend, tetapi provider belum diaktifkan.
 
 ## Status backend Supabase
 
 - Migration schema awal tersedia di `supabase/migrations/202607180001_initial_schema.sql`.
 - Migration foto kontribusi dan policy Storage tersedia di `supabase/migrations/202607180002_contribution_photos.sql`.
 - Dokumentasi tabel dan aturan akses tersedia di `supabase/README.md`.
-- `.env.local` sudah disiapkan dengan URL project dan publishable key Supabase.
-- Migration schema sudah dijalankan di project Supabase (dikonfirmasi user).
+- `.env.local` digunakan untuk URL project dan publishable key Supabase, serta diabaikan oleh Git.
+- Migration schema dan migration foto sudah dijalankan di project Supabase.
 - Supabase CLI belum tersedia di workspace, sehingga verifikasi langsung dari lokal belum dilakukan.
 
 ## Progress project
@@ -47,8 +48,7 @@ npm.cmd run dev
 - [x] Membuat migration Supabase dengan tabel, trigger, index, dan Row Level Security.
 - [x] Menyiapkan konfigurasi environment Supabase untuk frontend.
 - [x] Menjalankan migration schema di Supabase.
-- [x] Membuat `supabase/seed.sql` berisi data demo kuliner Bandung.
-- [x] Menjalankan seed data demo di Supabase.
+- [x] Membuat dan menjalankan seed data demo kuliner Bandung.
 - [x] Membuat adapter query untuk `places` dan `place_hours`.
 - [x] Menghubungkan halaman jelajah dan detail tempat ke Supabase.
 - [x] Menambahkan login dan registrasi email/password dengan Supabase Auth.
@@ -64,16 +64,19 @@ npm.cmd run dev
 - [x] Membuat panel admin aktif di `/admin` untuk approve, reject dengan alasan, edit, archive, dan restore usulan.
 - [x] Mempromosikan usulan yang disetujui ke `places`, `place_hours`, dan `place_photos`, serta mencatat aksi di `moderation_logs`.
 - [x] Menampilkan foto `place_photos` yang approved pada kartu beranda, favorit, dan halaman detail melalui signed URL.
+- [x] Mengganti pratinjau visual dengan peta interaktif Leaflet/OpenStreetMap menggunakan koordinat tempat, marker, zoom, tooltip, dan lokasi pengguna.
+- [x] Menambahkan geocoding alamat pada form usulan dengan hasil pencarian Nominatim serta pin peta yang dapat dipilih lewat klik dan digeser untuk koreksi manual.
 
-### Tahap berikutnya — Foto usulan dan moderasi admin
+### Verifikasi yang sudah dilakukan
 
-Fitur foto, riwayat kontribusi, dan moderasi pada tahap ini sudah diimplementasikan. Daftar berikut berisi aktivasi/verifikasi yang masih perlu dilakukan.
+1. [x] Smoke test login email/password, logout, favorit, upload foto, approve/reject, archive, dan foto publik.
+2. [x] Menjalankan migration `supabase/migrations/202607180002_contribution_photos.sql` di project Supabase.
+3. [x] Mengatur minimal satu akun admin dengan role `admin` melalui SQL Editor.
+4. [x] Menguji peta asli dan marker tempat dari koordinat Supabase.
 
-1. Uji login email/password, logout, simpan favorit, dan hapus favorit di browser lokal.
-2. Jalankan migration `supabase/migrations/202607180002_contribution_photos.sql` di project Supabase.
-3. Atur minimal satu akun admin dengan `update public.profiles set role = 'admin' where id = '<user_id>';` melalui SQL Editor.
-4. Konfigurasi Google OAuth menjelang deployment atau ketika domain production sudah tersedia.
-5. Ganti pratinjau visual dengan integrasi peta asli setelah provider Maps dipilih.
+### Pekerjaan yang ditunda
+
+- [ ] Konfigurasi Google OAuth sampai domain production atau kebutuhan login Google sudah siap.
 
 ## Catatan integrasi data
 
@@ -86,6 +89,8 @@ Fitur foto, riwayat kontribusi, dan moderasi pada tahap ini sudah diimplementasi
 - Foto usulan di-upload ke bucket private `place-submission-photos`; foto yang sudah disetujui dipakai ulang oleh `place_photos`.
 - Riwayat kontribusi tersedia di `/kontribusi`; panel admin memerlukan role `admin` pada `profiles`.
 - Foto approved pada katalog publik diambil dari bucket private melalui signed URL; foto pending tetap tidak ditampilkan ke pengunjung.
+- Peta menggunakan Leaflet dengan tile OpenStreetMap dan tidak memerlukan Google Maps API key.
+- Form usulan menyediakan tombol pencarian alamat berbasis Nominatim; user tetap memilih hasil yang sesuai atau mengeklik peta untuk menempatkan pin sebelum mengirim.
 
 ## Status authentication
 
@@ -99,7 +104,7 @@ Fitur foto, riwayat kontribusi, dan moderasi pada tahap ini sudah diimplementasi
 
 - Login email/password dan fitur favorit digunakan untuk pengujian lokal.
 - Google OAuth belum perlu diaktifkan selama aplikasi masih berjalan di localhost.
-- Fokus tahap berikutnya adalah konfigurasi Google OAuth dan integrasi peta asli setelah kebutuhan deployment/provider diputuskan.
+- Peta asli menggunakan provider free Leaflet/OpenStreetMap untuk tahap MVP.
 
 ## Catatan kerja untuk sesi berikutnya
 

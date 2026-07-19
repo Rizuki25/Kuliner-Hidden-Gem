@@ -1,7 +1,9 @@
-import { ArrowLeft, CheckCircle2, ImagePlus, LoaderCircle, MapPin, Plus, X } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, ImagePlus, LoaderCircle, MapPin, Plus, Search, X } from 'lucide-react'
 import { FormEvent, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { LocationPicker } from '../components/LocationPicker'
 import { useAuth } from '../context/AuthContext'
+import { searchAddress, type GeocodingResult } from '../lib/geocoding'
 import {
   createPlaceSubmission,
   MAX_SUBMISSION_PHOTOS,
@@ -20,6 +22,14 @@ const initialHours = (): Record<DayKey, SubmissionHourInput> => ({
   sabtu: { closed: false, open: '10:00', close: '22:00' },
   minggu: { closed: true, open: '10:00', close: '22:00' },
 })
+
+const defaultLatitude = -6.9175
+const defaultLongitude = 107.6191
+
+function safeCoordinate(value: string, fallback: number, minimum: number, maximum: number) {
+  const parsedValue = Number(value)
+  return Number.isFinite(parsedValue) && parsedValue >= minimum && parsedValue <= maximum ? parsedValue : fallback
+}
 
 export function SuggestPlacePage() {
   const navigate = useNavigate()
@@ -40,6 +50,11 @@ export function SuggestPlacePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string>()
   const [submitted, setSubmitted] = useState(false)
+  const [geocodeResults, setGeocodeResults] = useState<GeocodingResult[]>([])
+  const [isGeocoding, setIsGeocoding] = useState(false)
+  const [geocodeError, setGeocodeError] = useState<string>()
+  const [selectedLocationLabel, setSelectedLocationLabel] = useState('')
+  const [locationConfirmed, setLocationConfirmed] = useState(false)
 
   const userLabel = useMemo(() => user?.email ?? 'akun aktif', [user?.email])
 
@@ -69,6 +84,51 @@ export function SuggestPlacePage() {
     setPhotos((current) => [...current, ...nextFiles])
   }
 
+  async function handleGeocode() {
+    if (!address.trim()) {
+      setGeocodeError('Isi alamat lengkap terlebih dahulu.')
+      return
+    }
+
+    setIsGeocoding(true)
+    setGeocodeError(undefined)
+    setGeocodeResults([])
+
+    try {
+      const result = await searchAddress({ address, area })
+      if (result.error) {
+        setGeocodeError(result.error)
+        return
+      }
+      if (result.results.length === 0) {
+        setGeocodeError('Alamat belum ditemukan. Tambahkan nama jalan, nomor, atau patokan yang lebih spesifik.')
+        return
+      }
+
+      setGeocodeResults(result.results)
+    } catch {
+      setGeocodeError('Pencarian alamat gagal. Coba lagi atau isi koordinat secara manual.')
+    } finally {
+      setIsGeocoding(false)
+    }
+  }
+
+  function selectGeocodeResult(result: GeocodingResult) {
+    setLatitude(result.latitude.toFixed(6))
+    setLongitude(result.longitude.toFixed(6))
+    setSelectedLocationLabel(result.displayName)
+    setLocationConfirmed(true)
+    setGeocodeResults([])
+    setGeocodeError(undefined)
+  }
+
+  function handleManualLocationChange(nextLatitude: number, nextLongitude: number) {
+    setLatitude(nextLatitude.toFixed(6))
+    setLongitude(nextLongitude.toFixed(6))
+    setSelectedLocationLabel('Pin dipilih dari peta')
+    setLocationConfirmed(true)
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!user) return
@@ -87,6 +147,10 @@ export function SuggestPlacePage() {
     }
     if (invalidHours) {
       setError('Lengkapi jam buka dan jam tutup pada setiap hari yang tidak ditutup.')
+      return
+    }
+    if (!locationConfirmed) {
+      setError('Klik peta untuk menempatkan pin pada lokasi tempat terlebih dahulu.')
       return
     }
 
@@ -181,14 +245,39 @@ export function SuggestPlacePage() {
         <div className="submission-form__section">
           <div className="submission-form__section-heading"><span>02</span><div><strong>Lokasi dan kontak</strong><small>Bantu pengunjung menemukan tempatnya.</small></div></div>
           <div className="form-fields-grid">
-            <div className="form-field form-field--wide"><label htmlFor="address">Alamat lengkap *</label><input id="address" value={address} onChange={(event) => setAddress(event.target.value)} placeholder="Nama jalan, nomor, dan patokan" minLength={5} maxLength={240} required /></div>
-            <div className="form-field"><label htmlFor="area">Kecamatan/area</label><input id="area" value={area} onChange={(event) => setArea(event.target.value)} placeholder="Contoh: Coblong" maxLength={120} /></div>
+            <div className="form-field form-field--wide"><label htmlFor="address">Alamat lengkap *</label><input id="address" value={address} onChange={(event) => { setAddress(event.target.value); setGeocodeResults([]); setGeocodeError(undefined); setSelectedLocationLabel(''); setLocationConfirmed(false) }} placeholder="Nama jalan, nomor, dan patokan" minLength={5} maxLength={240} required /></div>
+            <div className="form-field"><label htmlFor="area">Kecamatan/area</label><input id="area" value={area} onChange={(event) => { setArea(event.target.value); setGeocodeResults([]); setGeocodeError(undefined); setSelectedLocationLabel(''); setLocationConfirmed(false) }} placeholder="Contoh: Coblong" maxLength={120} /></div>
             <div className="form-field"><label htmlFor="phone">Nomor telepon</label><input id="phone" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="Opsional" maxLength={40} /></div>
-            <div className="form-field"><label htmlFor="latitude">Latitude *</label><input id="latitude" type="number" step="any" value={latitude} onChange={(event) => setLatitude(event.target.value)} required /></div>
-            <div className="form-field"><label htmlFor="longitude">Longitude *</label><input id="longitude" type="number" step="any" value={longitude} onChange={(event) => setLongitude(event.target.value)} required /></div>
             <div className="form-field form-field--wide"><label htmlFor="website-url">Link usaha</label><input id="website-url" type="url" value={websiteUrl} onChange={(event) => setWebsiteUrl(event.target.value)} placeholder="https://... (opsional)" /></div>
           </div>
-          <div className="form-help"><MapPin size={14} /> Untuk sementara koordinat diisi manual. Integrasi pilih titik dari peta akan ditambahkan pada tahap Maps.</div>
+          <div className="geocoding-tools">
+            <div className="geocoding-tools__actions">
+              <button className="button button--secondary" type="button" onClick={() => void handleGeocode()} disabled={isGeocoding || !address.trim()}>
+                {isGeocoding ? <LoaderCircle size={15} className="spin" /> : <Search size={15} />}
+                {isGeocoding ? 'Mencari alamat...' : 'Cari titik dari alamat'}
+              </button>
+              <span>{selectedLocationLabel ? `Lokasi: ${selectedLocationLabel}` : 'Cari alamat atau klik peta untuk memilih titik lokasi.'}</span>
+            </div>
+            {geocodeError && <div className="geocoding-error" role="alert">{geocodeError}</div>}
+            {geocodeResults.length > 0 && (
+              <div className="geocoding-results" aria-label="Hasil pencarian alamat">
+                {geocodeResults.map((result) => (
+                  <button type="button" key={result.placeId} onClick={() => selectGeocodeResult(result)}>
+                    <MapPin size={16} />
+                    <span>{result.displayName}<small>{result.latitude.toFixed(6)}, {result.longitude.toFixed(6)}</small></span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="location-picker">
+            <LocationPicker
+              latitude={safeCoordinate(latitude, defaultLatitude, -90, 90)}
+              longitude={safeCoordinate(longitude, defaultLongitude, -180, 180)}
+              onChange={handleManualLocationChange}
+            />
+            <div className="form-help"><MapPin size={14} /> Klik peta untuk menempatkan pin. Pin juga bisa digeser untuk memperbaiki titik sebelum usulan dikirim.</div>
+          </div>
         </div>
 
         <div className="submission-form__section">
