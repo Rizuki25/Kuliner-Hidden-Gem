@@ -7,6 +7,7 @@ import {
   ClipboardCheck,
   Database,
   Edit3,
+  Flag,
   Image,
   LoaderCircle,
   MapPin,
@@ -22,6 +23,7 @@ import { FormEvent, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { BusinessClaimModerationPanel } from '../components/BusinessClaimModerationPanel'
 import { ReviewModerationPanel } from '../components/ReviewModerationPanel'
+import { ReportModerationPanel } from '../components/ReportModerationPanel'
 import { useAuth } from '../context/AuthContext'
 import {
   approveSubmission,
@@ -34,6 +36,7 @@ import {
 } from '../lib/moderation'
 import { supabase } from '../lib/supabase'
 import type { BusinessClaimAdminRecord } from '../lib/claims'
+import type { ContentReportAdminRecord } from '../lib/reports'
 import type { ReviewModerationRecord } from '../lib/reviews'
 import {
   type PlaceSubmissionRecord,
@@ -178,7 +181,8 @@ export function AdminPage() {
   const [submissions, setSubmissions] = useState<PlaceSubmissionRecord[]>([])
   const [reviews, setReviews] = useState<ReviewModerationRecord[]>([])
   const [claims, setClaims] = useState<BusinessClaimAdminRecord[]>([])
-  const [stats, setStats] = useState<{ pendingSubmissions: number; pendingReviews: number; pendingClaims: number; approvedPlaces: number }>()
+  const [reports, setReports] = useState<ContentReportAdminRecord[]>([])
+  const [stats, setStats] = useState<{ pendingSubmissions: number; pendingReviews: number; pendingClaims: number; pendingReports: number; approvedPlaces: number }>()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string>()
   const [filter, setFilter] = useState<StatusFilter>('pending')
@@ -223,11 +227,13 @@ export function AdminPage() {
       setSubmissions([])
       setReviews([])
       setClaims([])
+      setReports([])
       setStats(undefined)
     } else {
       setSubmissions(result.submissions)
       setReviews(result.reviews)
       setClaims(result.claims)
+      setReports(result.reports)
       setStats(result.stats)
     }
     setIsLoading(false)
@@ -363,6 +369,7 @@ export function AdminPage() {
         <div className="admin-stat"><ClipboardCheck size={18} /><span>Usulan menunggu</span><strong>{String(stats?.pendingSubmissions ?? 0).padStart(2, '0')}</strong></div>
         <div className="admin-stat"><ShieldCheck size={18} /><span>Ulasan ditinjau</span><strong>{String(stats?.pendingReviews ?? 0).padStart(2, '0')}</strong></div>
         <div className="admin-stat"><BriefcaseBusiness size={18} /><span>Klaim menunggu</span><strong>{String(stats?.pendingClaims ?? 0).padStart(2, '0')}</strong></div>
+        <div className="admin-stat"><Flag size={18} /><span>Laporan menunggu</span><strong>{String(stats?.pendingReports ?? 0).padStart(2, '0')}</strong></div>
         <div className="admin-stat"><Database size={18} /><span>Tempat aktif</span><strong>{String(stats?.approvedPlaces ?? 0).padStart(2, '0')}</strong></div>
       </div>
 
@@ -370,6 +377,7 @@ export function AdminPage() {
         <a href="#moderasi-usulan"><ClipboardCheck size={16} /> Usulan tempat</a>
         <a href="#moderasi-ulasan"><ShieldCheck size={16} /> Ulasan</a>
         <a href="#klaim-bisnis"><BriefcaseBusiness size={16} /> Klaim bisnis</a>
+        <a href="#laporan-konten"><Flag size={16} /> Laporan</a>
       </nav>
 
       <section className="admin-workspace" id="moderasi-usulan" aria-label="Daftar usulan tempat">
@@ -413,6 +421,7 @@ export function AdminPage() {
       </section>
       <ReviewModerationPanel reviews={reviews} isLoading={isLoading} onRefresh={loadWorkspace} onError={setError} />
       <BusinessClaimModerationPanel claims={claims} isLoading={isLoading} onRefresh={loadWorkspace} onError={setError} />
+      <ReportModerationPanel reports={reports} isLoading={isLoading} onRefresh={loadWorkspace} onError={setError} />
     </div>
   )
 }

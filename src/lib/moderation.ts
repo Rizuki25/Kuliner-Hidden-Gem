@@ -7,12 +7,14 @@ import {
 } from './submissions'
 import { fetchAdminReviews, type ReviewModerationRecord } from './reviews'
 import { fetchAdminClaims, type BusinessClaimAdminRecord } from './claims'
+import { fetchAdminReports } from './reports'
 import { supabase } from './supabase'
 
 export type AdminStats = {
   pendingSubmissions: number
   pendingReviews: number
   pendingClaims: number
+  pendingReports: number
   approvedPlaces: number
 }
 
@@ -101,19 +103,21 @@ function logModeration(
 }
 
 export async function fetchAdminWorkspace() {
-  if (!supabase) return { submissions: [], reviews: [], claims: [], stats: undefined, error: missingSupabaseError() }
+  if (!supabase) return { submissions: [], reviews: [], claims: [], reports: [], stats: undefined, error: missingSupabaseError() }
 
-  const [submissionResult, reviewsResult, claimsResult, approvedPlacesResult] = await Promise.all([
+  const [submissionResult, reviewsResult, claimsResult, reportsResult, approvedPlacesResult] = await Promise.all([
     fetchAllSubmissions(),
     fetchAdminReviews(),
     fetchAdminClaims(),
+    fetchAdminReports(),
     supabase.from('places').select('id', { count: 'exact', head: true }).eq('publication_status', 'approved'),
   ])
 
-  if (reviewsResult.error) return { submissions: [], reviews: [], claims: [], stats: undefined, error: reviewsResult.error }
-  if (claimsResult.error) return { submissions: [], reviews: [], claims: [], stats: undefined, error: claimsResult.error }
-  if (approvedPlacesResult.error) return { submissions: [], reviews: [], claims: [], stats: undefined, error: approvedPlacesResult.error.message }
-  if (submissionResult.error) return { submissions: [], reviews: [], claims: [], stats: undefined, error: submissionResult.error }
+  if (reviewsResult.error) return { submissions: [], reviews: [], claims: [], reports: [], stats: undefined, error: reviewsResult.error }
+  if (claimsResult.error) return { submissions: [], reviews: [], claims: [], reports: [], stats: undefined, error: claimsResult.error }
+  if (reportsResult.error) return { submissions: [], reviews: [], claims: [], reports: [], stats: undefined, error: reportsResult.error }
+  if (approvedPlacesResult.error) return { submissions: [], reviews: [], claims: [], reports: [], stats: undefined, error: approvedPlacesResult.error.message }
+  if (submissionResult.error) return { submissions: [], reviews: [], claims: [], reports: [], stats: undefined, error: submissionResult.error }
 
   const contributorIds = [...new Set(submissionResult.submissions.map((submission) => submission.submittedBy))]
   const profileMap = new Map<string, string | null>()
@@ -124,7 +128,7 @@ export async function fetchAdminWorkspace() {
       .select('id, display_name')
       .in('id', contributorIds)
 
-    if (profilesError) return { submissions: [], reviews: [], claims: [], stats: undefined, error: profilesError.message }
+    if (profilesError) return { submissions: [], reviews: [], claims: [], reports: [], stats: undefined, error: profilesError.message }
     for (const profile of profiles ?? []) {
       profileMap.set(profile.id as string, (profile.display_name as string | null) ?? null)
     }
@@ -139,10 +143,12 @@ export async function fetchAdminWorkspace() {
     submissions: await attachSubmissionPhotoUrls(submissionsWithContributors),
     reviews: reviewsResult.reviews,
     claims: claimsResult.claims,
+    reports: reportsResult.reports,
     stats: {
       pendingSubmissions: submissionsWithContributors.filter((submission) => submission.status === 'pending').length,
       pendingReviews: reviewsResult.reviews.filter((review) => review.status === 'pending').length,
       pendingClaims: claimsResult.claims.filter((claim) => claim.status === 'pending').length,
+      pendingReports: reportsResult.reports.filter((report) => report.status === 'pending').length,
       approvedPlaces: approvedPlacesResult.count ?? 0,
     } satisfies AdminStats,
   }

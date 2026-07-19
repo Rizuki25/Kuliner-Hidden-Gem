@@ -289,6 +289,35 @@ h1 em, h2 em { color: var(--orange-dark); font-family: 'Playfair Display', serif
 .review-item__topline strong { color: var(--ink); font-size: 12px; }
 .review-item__topline span { color: var(--soft-muted); font-family: 'DM Mono', monospace; font-size: 9px; }
 .review-item p { margin: 8px 0 0; color: var(--muted); font-size: 12px; line-height: 1.65; white-space: pre-wrap; }
+.review-item__footer { display: flex; justify-content: flex-end; margin-top: 10px; }
+.detail-report-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 13px; }
+.report-control { position: relative; }
+.report-control__trigger, .report-control__sent { display: inline-flex; align-items: center; gap: 5px; min-height: 30px; padding: 0 9px; border: 1px solid var(--line); border-radius: 7px; color: var(--muted); background: transparent; font-size: 10px; }
+.report-control__trigger { cursor: pointer; }
+.report-control__trigger:hover { border-color: #d7b09d; color: #9a6148; background: #fff7f2; }
+.report-control__sent { border-color: #dbe5d0; color: #668050; background: #eff4e9; }
+.report-modal { position: fixed; z-index: 100; inset: 0; display: grid; place-items: center; padding: 20px; }
+.report-modal__backdrop { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: rgba(37, 33, 29, .52); cursor: pointer; animation: report-modal-fade .18s ease-out both; }
+.report-form { position: relative; z-index: 1; display: grid; gap: 13px; width: min(430px, 100%); max-height: min(620px, calc(100vh - 40px)); overflow-y: auto; margin: 0; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); box-shadow: 0 22px 70px rgba(37, 33, 29, .24); animation: report-modal-in .22s cubic-bezier(.2, .8, .2, 1) both; }
+.report-form::before { position: absolute; top: 0; right: 22px; left: 22px; height: 3px; border-radius: 0 0 999px 999px; content: ''; background: var(--orange); }
+.report-form__heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.report-form__heading strong { color: var(--ink); font-size: 12px; }
+.report-form__heading .icon-button { width: 27px; height: 27px; flex: 0 0 auto; }
+.report-form label { display: grid; gap: 5px; color: var(--muted); font-size: 10px; font-weight: 700; }
+.report-form label > span { color: var(--ink); }
+.report-form label small { color: var(--soft-muted); font-size: 9px; font-weight: 400; }
+.report-form select, .report-form textarea { width: 100%; border: 1px solid var(--line); border-radius: 7px; outline: 0; color: var(--ink); background: #fbf9f4; font-size: 11px; }
+.report-form select { min-height: 35px; padding: 0 8px; }
+.report-form textarea { padding: 8px; line-height: 1.45; resize: vertical; }
+.report-form select:focus, .report-form textarea:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(221, 109, 67, .1); }
+.report-form__message { margin: 0; }
+.report-form__footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--soft-muted); font-family: 'DM Mono', monospace; font-size: 9px; line-height: 1.4; }
+.report-form__footer .button { flex-shrink: 0; min-height: 34px; padding: 0 10px; font-size: 10px; }
+@keyframes report-modal-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes report-modal-in { from { opacity: 0; transform: translateY(12px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .report-modal__backdrop, .report-form { animation: none; }
+}
 .admin-review-workspace { margin-top: 28px; }
 .admin-review-list { display: grid; gap: 14px; }
 .admin-review-card { overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
@@ -303,6 +332,23 @@ h1 em, h2 em { color: var(--orange-dark); font-family: 'Playfair Display', serif
 .admin-review-card__contributor svg { color: var(--orange); }
 .admin-review-card__contributor strong { color: var(--ink); font-size: 11px; }
 .admin-review-card__contributor small { flex: 1 0 100%; overflow: hidden; padding-left: 20px; font-family: 'DM Mono', monospace; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
+.admin-report-workspace { margin-top: 28px; }
+.admin-report-list { display: grid; gap: 14px; }
+.admin-report-card { overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+.admin-report-card__body { display: grid; gap: 12px; padding: 17px; }
+.admin-report-card__heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 15px; }
+.admin-report-card__heading h3 { margin: 6px 0 0; color: var(--ink); font-size: 20px; letter-spacing: -.05em; }
+.admin-report-card__reason { display: grid; gap: 5px; padding: 10px 11px; border-radius: 8px; color: #9a6148; background: #fbefe8; font-size: 11px; line-height: 1.5; }
+.admin-report-card__reason strong { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; }
+.admin-report-card__photo { width: min(260px, 100%); aspect-ratio: 4 / 3; border-radius: 9px; object-fit: cover; background: #eee8dd; }
+.admin-report-card__entity-text { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; white-space: pre-wrap; }
+.admin-report-card__meta { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; color: var(--soft-muted); font-size: 10px; }
+.admin-report-card__meta svg { color: var(--orange); }
+.admin-report-card__meta strong { color: var(--ink); font-size: 11px; }
+.admin-report-card__meta small { flex-basis: 100%; overflow: hidden; padding-left: 20px; color: var(--soft-muted); font-family: 'DM Mono', monospace; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
+.admin-report-card__place-link { display: inline-flex; align-items: center; gap: 5px; width: fit-content; color: var(--orange-dark); font-size: 10px; font-weight: 700; }
+.admin-report-card__place-link:hover { color: var(--ink); }
+.admin-report-card__resolved { display: flex; align-items: center; gap: 7px; padding: 0 17px 17px; color: #668050; font-size: 10px; line-height: 1.45; }
 .admin-claim-workspace { margin-top: 28px; }
 .admin-claim-list { display: grid; gap: 14px; }
 .admin-claim-card { overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
@@ -436,7 +482,7 @@ h1 em, h2 em { color: var(--orange-dark); font-family: 'Playfair Display', serif
 
 .admin-page__heading { margin-bottom: 30px; text-align: left; }
 .admin-page__heading p { margin-left: 0; }
-.admin-stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.admin-stat-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
 .admin-stat { min-height: 125px; display: flex; flex-direction: column; gap: 11px; padding: 20px; border: 1px solid var(--line); border-radius: 13px; background: var(--card); }
 .admin-stat svg { color: var(--orange); }
 .admin-stat span { color: var(--muted); font-size: 12px; }
@@ -491,6 +537,8 @@ h1 em, h2 em { color: var(--orange-dark); font-family: 'Playfair Display', serif
 .contribution-status--approved, .admin-status--approved { color: #668050; background: #e5eedc; }
 .contribution-status--rejected, .admin-status--rejected { color: #9a6148; background: #fbefe8; }
 .contribution-status--archived, .admin-status--archived { color: #7c7770; background: #ebe8e1; }
+.admin-status--ignored { color: #7c7770; background: #ebe8e1; }
+.admin-status--actioned { color: #668050; background: #e5eedc; }
 .contribution-card__date, .admin-submission-card__topline > span:last-child { color: var(--soft-muted); font-family: 'DM Mono', monospace; font-size: 9px; }
 .contribution-card__body { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 20px; padding: 18px; }
 .contribution-card__photos { min-height: 142px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; overflow: hidden; border-radius: 10px; background: #eee8dd; }
@@ -1219,7 +1267,7 @@ h1 em, h2 em { color: var(--orange-dark); font-family: 'Playfair Display', serif
 .app-shell--airbnb .admin-page__heading--workspace p { max-width: 620px; color: var(--home-muted); font-size: 14px; line-height: 1.55; }
 .app-shell--airbnb .admin-page__heading--workspace .button { min-width: 124px; }
 
-.app-shell--airbnb .admin-stat-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.app-shell--airbnb .admin-stat-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
 .app-shell--airbnb .admin-stat { min-height: 154px; position: relative; gap: 10px; padding: 20px; border-color: var(--home-line); border-radius: 14px; background: #fff; transition: box-shadow .2s ease, transform .2s ease; }
 .app-shell--airbnb .admin-stat::before { position: absolute; top: 0; right: 20px; left: 20px; height: 3px; border-radius: 0 0 999px 999px; content: ''; background: var(--home-primary); opacity: .9; }
 .app-shell--airbnb .admin-stat:hover { box-shadow: rgba(0,0,0,.02) 0 0 0 1px, rgba(0,0,0,.04) 0 2px 6px, rgba(0,0,0,.1) 0 4px 8px; transform: translateY(-2px); }
@@ -1250,10 +1298,12 @@ h1 em, h2 em { color: var(--orange-dark); font-family: 'Playfair Display', serif
 .app-shell--airbnb .admin-submission-list { gap: 16px; }
 .app-shell--airbnb .admin-submission-card,
 .app-shell--airbnb .admin-review-card,
-.app-shell--airbnb .admin-claim-card { overflow: hidden; border-color: var(--home-line); border-radius: 14px; background: #fff; box-shadow: none; transition: box-shadow .2s ease, transform .2s ease; }
+.app-shell--airbnb .admin-claim-card,
+.app-shell--airbnb .admin-report-card { overflow: hidden; border-color: var(--home-line); border-radius: 14px; background: #fff; box-shadow: none; transition: box-shadow .2s ease, transform .2s ease; }
 .app-shell--airbnb .admin-submission-card:hover,
 .app-shell--airbnb .admin-review-card:hover,
-.app-shell--airbnb .admin-claim-card:hover { box-shadow: rgba(0,0,0,.02) 0 0 0 1px, rgba(0,0,0,.04) 0 2px 6px, rgba(0,0,0,.1) 0 4px 8px; }
+.app-shell--airbnb .admin-claim-card:hover,
+.app-shell--airbnb .admin-report-card:hover { box-shadow: rgba(0,0,0,.02) 0 0 0 1px, rgba(0,0,0,.04) 0 2px 6px, rgba(0,0,0,.1) 0 4px 8px; }
 .app-shell--airbnb .admin-submission-card__topline,
 .app-shell--airbnb .admin-review-card__topline { min-height: 52px; padding: 12px 18px; border-color: #ebebeb; }
 .app-shell--airbnb .admin-status { min-height: 28px; padding: 0 10px; font-family: inherit; font-size: 10px; font-weight: 600; letter-spacing: 0; text-transform: none; }
@@ -1261,6 +1311,8 @@ h1 em, h2 em { color: var(--orange-dark); font-family: 'Playfair Display', serif
 .app-shell--airbnb .admin-status--approved { color: #397153; background: #eaf7ef; }
 .app-shell--airbnb .admin-status--rejected { color: #a13626; background: #fff0ed; }
 .app-shell--airbnb .admin-status--archived { color: var(--home-muted); background: #f2f2f2; }
+.app-shell--airbnb .admin-status--ignored { color: var(--home-muted); background: #f2f2f2; }
+.app-shell--airbnb .admin-status--actioned { color: #397153; background: #eaf7ef; }
 .app-shell--airbnb .admin-submission-card__topline > span:last-child,
 .app-shell--airbnb .admin-review-card__topline > span:last-child { color: var(--home-muted); font-family: inherit; font-size: 11px; }
 .app-shell--airbnb .admin-submission-card__body { grid-template-columns: 240px minmax(0, 1fr); gap: 0; padding: 0; }
@@ -1324,6 +1376,17 @@ h1 em, h2 em { color: var(--orange-dark); font-family: 'Playfair Display', serif
 .app-shell--airbnb .admin-review-card__contributor svg { color: var(--home-primary); }
 .app-shell--airbnb .admin-review-card__contributor strong { color: var(--home-ink); font-size: 12px; }
 .app-shell--airbnb .admin-review-card__contributor small { font-family: inherit; font-size: 9px; }
+.app-shell--airbnb .admin-report-card__body { padding: 22px; }
+.app-shell--airbnb .admin-report-card__heading h3 { color: var(--home-ink); font-size: 21px; font-weight: 600; letter-spacing: -.03em; }
+.app-shell--airbnb .admin-report-card__reason { color: #a13626; background: #fff0ed; }
+.app-shell--airbnb .admin-report-card__entity-text { color: var(--home-muted); font-size: 13px; }
+.app-shell--airbnb .admin-report-card__meta { color: var(--home-muted); font-size: 11px; }
+.app-shell--airbnb .admin-report-card__meta svg { color: var(--home-primary); }
+.app-shell--airbnb .admin-report-card__meta strong { color: var(--home-ink); font-size: 12px; }
+.app-shell--airbnb .admin-report-card__meta small { font-family: inherit; font-size: 9px; }
+.app-shell--airbnb .admin-report-card__place-link { color: var(--home-ink); font-size: 11px; }
+.app-shell--airbnb .admin-report-card__place-link:hover { color: var(--home-primary); }
+.app-shell--airbnb .admin-report-card__resolved { padding: 0 22px 22px; color: #397153; font-size: 11px; }
 .app-shell--airbnb .admin-claim-card__body { padding: 20px; }
 .app-shell--airbnb .admin-claim-card__grid { gap: 14px; }
 .app-shell--airbnb .admin-claim-card__grid > div { padding: 12px; border-radius: 10px; background: #f7f7f7; }

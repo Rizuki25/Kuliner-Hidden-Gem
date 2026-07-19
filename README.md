@@ -77,6 +77,7 @@ npm.cmd run dev
 - [x] Menambahkan panel admin untuk memeriksa bukti, menyetujui, dan menolak klaim bisnis.
 - [x] Approval klaim otomatis memberikan akses manager dan role `owner` melalui trigger Supabase.
 - [x] Menambahkan UI owner di `/kelola-tempat` untuk mengubah deskripsi, kontak, link, jam buka, dan foto tempat terverifikasi.
+- [x] Menambahkan pelaporan konten untuk tempat, ulasan, dan foto, lengkap dengan antrean tindakan di panel admin.
 
 ### Verifikasi yang sudah dilakukan
 
@@ -103,10 +104,18 @@ npm.cmd run dev
 
 ### Verifikasi fitur pengelolaan owner
 
-- [ ] Owner membuka `/kelola-tempat` dan hanya melihat tempat yang memiliki manager aktif.
-- [ ] Owner memperbarui deskripsi, kontak, link, dan jam buka.
-- [ ] Owner mengunggah foto, mengganti foto sampul, dan menghapus foto.
-- [ ] Perubahan owner tampil pada halaman publik tempat.
+- [x] Owner membuka `/kelola-tempat` dan hanya melihat tempat yang memiliki manager aktif.
+- [x] Owner memperbarui deskripsi, kontak, link, dan jam buka.
+- [x] Owner mengunggah foto, mengganti foto sampul, dan menghapus foto.
+- [x] Perubahan owner tampil pada halaman publik tempat.
+
+### Verifikasi fitur pelaporan konten
+
+- [x] Form laporan tampil sebagai modal animasi dan tidak mengubah tinggi foto atau layout halaman detail.
+- [ ] User login dapat melaporkan tempat, ulasan publik, dan foto utama dari halaman publik.
+- [ ] Pengiriman laporan ganda untuk konten yang sama ditahan selama laporan sebelumnya masih pending.
+- [ ] Admin melihat laporan pending, mencari laporan, lalu mengabaikan atau menandai laporan sebagai ditindaklanjuti.
+- [ ] Admin dapat mengarsipkan tempat, ulasan, atau foto dari laporan; konten arsip tidak lagi tampil publik.
 
 ### Pekerjaan yang ditunda
 
@@ -128,12 +137,21 @@ npm.cmd run dev
 - Form usulan menyediakan tombol pencarian alamat berbasis Nominatim; user tetap memilih hasil yang sesuai atau mengeklik peta untuk menempatkan pin sebelum mengirim.
 - Halaman detail menyediakan rating 1–5, ulasan pending milik user, daftar ulasan approved, serta edit/hapus ulasan sendiri.
 - Panel admin memuat antrean ulasan dari tabel `reviews`; perubahan status memicu perhitungan ulang `places.rating` dan `places.review_count` melalui trigger database.
+- Tombol `Laporkan` pada halaman detail dan daftar ulasan menyimpan laporan ke `content_reports`; user yang belum login diarahkan ke login terlebih dahulu.
+- Form laporan tampil sebagai modal animasi agar tidak mengubah tinggi foto atau layout halaman detail.
+- Panel admin memuat antrean `content_reports` dan mencatat keputusan laporan pada `moderation_logs`; aksi arsip mengubah status publik konten terkait.
 
 ## Integrasi klaim bisnis
 
 - Pengajuan klaim bisnis memakai bucket private `business-claim-proofs`; bukti hanya dapat dibaca oleh pengaju dan admin melalui signed URL.
 - Panel admin memuat antrean klaim dari tabel `business_claims`; approval memicu sinkronisasi `place_managers` dan role `owner` melalui trigger database.
-- UI pengelolaan detail oleh owner terverifikasi masih menjadi subtahap berikutnya.
+- UI pengelolaan detail owner tersedia di `/kelola-tempat`; perubahan kontak dan link juga ditampilkan pada halaman publik tempat.
+
+## Tahap berikutnya
+
+- [x] Fase 6: implementasi pelaporan konten dan antrean laporan admin selesai; checklist fungsional masih menunggu pengujian manual.
+- [ ] Hardening production: validasi spam, audit akses, pemulihan kata sandi, dan pengaturan profil.
+- [ ] Konfigurasi Google OAuth setelah kebutuhan deployment/domain sudah siap.
 
 ## Status authentication
 

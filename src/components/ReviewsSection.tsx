@@ -3,6 +3,7 @@ import { FormEvent, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { deleteReview, fetchPlaceReviews, saveReview, type ReviewRecord } from '../lib/reviews'
+import { ReportContentButton } from './ReportContentButton'
 import { ReviewStars } from './ReviewStars'
 
 type ReviewsSectionProps = {
@@ -137,6 +138,7 @@ export function ReviewsSection({ placeId, onChanged }: ReviewsSectionProps) {
             <article className="review-item" key={review.id}>
               <div className="review-item__topline"><div><strong>{review.authorName || 'Pengunjung Bandung'}</strong><span>{formatReviewDate(review.createdAt)}</span></div><ReviewStars value={review.rating} size={14} /></div>
               <p>{review.body}</p>
+              <div className="review-item__footer"><ReportContentButton entityType="review" entityId={review.id} entityLabel="ulasan" /></div>
             </article>
           ))}
         </div>

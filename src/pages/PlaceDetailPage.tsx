@@ -2,6 +2,7 @@ import { ArrowLeft, CalendarDays, Check, Clock3, ExternalLink, Globe2, Heart, In
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { BusinessClaimCard } from '../components/BusinessClaimCard'
+import { ReportContentButton } from '../components/ReportContentButton'
 import { ReviewsSection } from '../components/ReviewsSection'
 import { useAuth } from '../context/AuthContext'
 import { useFavorites } from '../context/FavoritesContext'
@@ -70,6 +71,8 @@ export function PlaceDetailPage() {
   }
 
   const routeUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + place.lat + ',' + place.lng
+  const heroPhoto = place.photoRecords?.find((photo) => photo.url)
+  const heroPhotoUrl = heroPhoto?.url ?? place.photoUrls?.[0]
 
   return (
     <div className="page-width detail-page">
@@ -77,10 +80,10 @@ export function PlaceDetailPage() {
 
       <section className="detail-hero">
         <div className="detail-hero__visual" style={{ background: 'linear-gradient(135deg, ' + place.accent + ', #282522)' }}>
-          {place.photoUrls?.[0] && <img className="detail-hero__photo" src={place.photoUrls[0]} alt={'Foto ' + place.name} />}
-          {place.photoUrls?.[0] && <span className="detail-hero__photo-wash" aria-hidden="true" />}
+          {heroPhotoUrl && <img className="detail-hero__photo" src={heroPhotoUrl} alt={'Foto ' + place.name} />}
+          {heroPhotoUrl && <span className="detail-hero__photo-wash" aria-hidden="true" />}
           <span className="place-card__noise" />
-          {!place.photoUrls?.[0] && <span className="detail-hero__emoji" aria-hidden="true">{place.emoji}</span>}
+          {!heroPhotoUrl && <span className="detail-hero__emoji" aria-hidden="true">{place.emoji}</span>}
           <span className="detail-hero__stamp">BANDUNG<br /><small>LOCAL FIND</small></span>
         </div>
         <div className="detail-hero__copy">
@@ -109,6 +112,7 @@ export function PlaceDetailPage() {
             </button>
           </div>
           {favoriteError && <div className="data-notice data-notice--error detail-action-error" role="alert">Favorit gagal disimpan: {favoriteError}</div>}
+          <div className="detail-report-actions"><ReportContentButton entityType="place" entityId={place.id} entityLabel="tempat ini" />{heroPhoto?.id && <ReportContentButton variant="photo" entityType="place_photo" entityId={heroPhoto.id} entityLabel="foto tempat ini" />}</div>
         </div>
       </section>
 

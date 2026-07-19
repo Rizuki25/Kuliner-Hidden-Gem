@@ -17,6 +17,16 @@ export type OpeningHour = {
   closed?: boolean
 }
 
+export type PlacePhoto = {
+  id: string
+  storagePath: string
+  caption: string | null
+  sortOrder: number
+  isCover: boolean
+  publicationStatus: 'approved' | 'pending' | 'rejected' | 'archived'
+  url?: string
+}
+
 export type Place = {
   id: string
   name: string
@@ -41,6 +51,7 @@ export type Place = {
   highlights: string[]
   openingHours: Record<DayKey, OpeningHour>
   photoUrls?: string[]
+  photoRecords?: PlacePhoto[]
 }
 
 export const dayLabels: Record<DayKey, string> = {

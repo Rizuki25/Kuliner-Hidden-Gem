@@ -1,5 +1,5 @@
 import { mockPlaces } from '../data/mockPlaces'
-import type { DayKey, HalalStatus, OpeningHour, Place, PriceRange } from '../types/place'
+import type { DayKey, HalalStatus, OpeningHour, Place, PlacePhoto, PriceRange } from '../types/place'
 import { SUBMISSION_PHOTO_BUCKET } from './submissions'
 import { supabase } from './supabase'
 
@@ -12,7 +12,9 @@ type SupabasePlaceHourRow = {
 }
 
 type SupabasePlacePhotoRow = {
+  id: string
   storage_path: string
+  caption: string | null
   sort_order: number
   is_cover: boolean
   publication_status: 'approved' | 'pending' | 'rejected' | 'archived'
@@ -128,11 +130,10 @@ function getTagline(description: string | null): string {
   return firstSentence.length > 72 ? `${firstSentence.slice(0, 69)}…` : firstSentence
 }
 
-function getPhotoPaths(row: SupabasePlaceRow) {
+function getApprovedPhotoRows(row: SupabasePlaceRow) {
   return (row.place_photos ?? [])
     .filter((photo) => photo.publication_status === 'approved')
     .sort((left, right) => Number(right.is_cover) - Number(left.is_cover) || left.sort_order - right.sort_order)
-    .map((photo) => photo.storage_path)
 }
 
 async function mapSupabasePlaceWithPhotos(row: SupabasePlaceRow): Promise<Place> {
@@ -140,16 +141,24 @@ async function mapSupabasePlaceWithPhotos(row: SupabasePlaceRow): Promise<Place>
   const client = supabase
   if (!client) return place
 
-  const photoUrls = await Promise.all(getPhotoPaths(row).map(async (storagePath) => {
+  const photoRecords = await Promise.all(getApprovedPhotoRows(row).map(async (photo): Promise<PlacePhoto> => {
     const { data } = await client.storage
       .from(SUBMISSION_PHOTO_BUCKET)
-      .createSignedUrl(storagePath, 60 * 60)
+      .createSignedUrl(photo.storage_path, 60 * 60)
 
-    return data?.signedUrl
+    return {
+      id: photo.id,
+      storagePath: photo.storage_path,
+      caption: photo.caption,
+      sortOrder: photo.sort_order,
+      isCover: photo.is_cover,
+      publicationStatus: photo.publication_status,
+      url: data?.signedUrl,
+    }
   }))
 
-  const usablePhotoUrls = photoUrls.filter((url): url is string => Boolean(url))
-  return usablePhotoUrls.length > 0 ? { ...place, photoUrls: usablePhotoUrls } : place
+  const usablePhotoUrls = photoRecords.flatMap((photo) => photo.url ? [photo.url] : [])
+  return photoRecords.length > 0 ? { ...place, photoUrls: usablePhotoUrls, photoRecords } : place
 }
 
 export function mapSupabasePlace(row: SupabasePlaceRow): Place {
@@ -205,7 +214,9 @@ const placeSelect = `
     close_time
   ),
   place_photos (
+    id,
     storage_path,
+    caption,
     sort_order,
     is_cover,
     publication_status
