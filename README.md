@@ -123,12 +123,12 @@ npm.cmd run dev
 
 ### Verifikasi hardening production
 
-- [ ] User meminta pemulihan password dan berhasil membuat password baru dari tautan email.
-- [ ] User memperbarui nama tampilan dan password dari `/profil`.
-- [ ] Role user tidak dapat diubah melalui pengaturan profil; hanya nama tampilan yang dapat diperbarui.
-- [ ] Pengajuan usulan ke-6 dalam periode 24 jam ditolak oleh database dengan pesan batas harian.
-- [ ] Laporan pending ganda untuk user dan konten yang sama ditolak oleh database.
-- [ ] User tidak dapat memindahkan ulasan miliknya ke tempat lain atau mengubah metadata moderasi.
+- [x] User meminta pemulihan password dan berhasil membuat password baru dari tautan email.
+- [x] User memperbarui nama tampilan dan password dari `/profil`.
+- [x] Role user tidak dapat diubah melalui pengaturan profil; hanya nama tampilan yang dapat diperbarui.
+- [x] Pengajuan usulan ke-6 dalam periode 24 jam ditolak oleh database dengan pesan batas harian.
+- [x] Laporan pending ganda untuk user dan konten yang sama ditolak oleh database.
+- [x] User tidak dapat memindahkan ulasan miliknya ke tempat lain atau mengubah metadata moderasi.
 
 ### Pekerjaan yang ditunda
 
@@ -166,7 +166,7 @@ npm.cmd run dev
 ## Tahap berikutnya
 
 - [x] Fase 6: implementasi pelaporan konten dan antrean laporan admin selesai; seluruh checklist fungsional sudah diuji dan berhasil.
-- [x] Hardening production: implementasi validasi, audit akses, pemulihan password, dan pengaturan profil selesai; checklist manual masih menunggu pengujian.
+- [x] Hardening production: implementasi validasi, audit akses, pemulihan password, dan pengaturan profil selesai serta seluruh checklist sudah diuji dan berhasil.
 - [ ] Konfigurasi Google OAuth setelah kebutuhan deployment/domain sudah siap.
 
 ## Status authentication

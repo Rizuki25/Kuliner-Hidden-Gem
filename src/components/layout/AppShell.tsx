@@ -12,7 +12,8 @@ export function AppShell() {
   const location = useLocation()
   const isAdmin = location.pathname.startsWith('/admin')
   const isHome = location.pathname === '/'
-  const usesMarketplaceTheme = isHome || location.pathname === '/favorit' || location.pathname === '/kontribusi' || location.pathname === '/usulkan-tempat' || isAdmin
+  const isPlaceDetail = location.pathname.startsWith('/tempat/')
+  const usesMarketplaceTheme = isHome || isPlaceDetail || location.pathname === '/favorit' || location.pathname === '/kontribusi' || location.pathname === '/usulkan-tempat' || isAdmin
   const { user, signOut } = useAuth()
 
   return (

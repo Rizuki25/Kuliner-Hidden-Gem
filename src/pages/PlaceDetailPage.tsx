@@ -1,4 +1,4 @@
-import { ArrowLeft, CalendarDays, Check, Clock3, ExternalLink, Globe2, Heart, Instagram, MapPin, Phone, Star } from 'lucide-react'
+import { ArrowLeft, CalendarDays, Check, ChevronRight, Clock3, ExternalLink, Flag, Globe2, Heart, Instagram, MapPin, Phone, Share2, Star } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { BusinessClaimCard } from '../components/BusinessClaimCard'
@@ -55,7 +55,12 @@ export function PlaceDetailPage() {
   }
 
   if (isLoading) {
-    return <div className="page-width detail-loading">Memuat detail tempat...</div>
+    return (
+      <div className="page-width detail-loading">
+        <span className="loading-dot" />
+        Memuat detail tempat...
+      </div>
+    )
   }
 
   if (!place) {
@@ -71,91 +76,220 @@ export function PlaceDetailPage() {
   }
 
   const routeUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + place.lat + ',' + place.lng
-  const heroPhoto = place.photoRecords?.find((photo) => photo.url)
-  const heroPhotoUrl = heroPhoto?.url ?? place.photoUrls?.[0]
+  const approvedPhotos = (place.photoRecords ?? []).filter((photo) => photo.url)
+  const photoPool = approvedPhotos.length > 0
+    ? approvedPhotos.map((photo) => ({ id: photo.id, url: photo.url as string, caption: photo.caption }))
+    : (place.photoUrls ?? []).map((url, index) => ({ id: 'legacy-' + index, url, caption: null as string | null }))
+  const galleryPhotos = photoPool.slice(0, 5)
+  const heroPhoto = galleryPhotos[0]
+  const sidePhotos = galleryPhotos.slice(1, 5)
+  const isSaved = isFavorite(place.id)
 
   return (
     <div className="page-width detail-page">
-      <Link className="back-link" to="/"><ArrowLeft size={16} /> Kembali ke jelajah</Link>
+      <nav className="detail-breadcrumb" aria-label="Jejak navigasi">
+        <Link className="detail-breadcrumb__link" to="/"><ArrowLeft size={14} /> Jelajah</Link>
+        <ChevronRight size={13} aria-hidden="true" />
+        <span>{place.area}</span>
+        <ChevronRight size={13} aria-hidden="true" />
+        <strong>{place.name}</strong>
+      </nav>
 
-      <section className="detail-hero">
-        <div className="detail-hero__visual" style={{ background: 'linear-gradient(135deg, ' + place.accent + ', #282522)' }}>
-          {heroPhotoUrl && <img className="detail-hero__photo" src={heroPhotoUrl} alt={'Foto ' + place.name} />}
-          {heroPhotoUrl && <span className="detail-hero__photo-wash" aria-hidden="true" />}
-          <span className="place-card__noise" />
-          {!heroPhotoUrl && <span className="detail-hero__emoji" aria-hidden="true">{place.emoji}</span>}
-          <span className="detail-hero__stamp">BANDUNG<br /><small>LOCAL FIND</small></span>
-        </div>
-        <div className="detail-hero__copy">
-          <div className="eyebrow-row"><MapPin size={15} /> {place.area} · Bandung</div>
+      <header className="detail-heading">
+        <div className="detail-heading__copy">
           <h1>{place.name}</h1>
-          <p className="detail-hero__tagline">{place.tagline}</p>
-          <div className="detail-badges">
-            <span className={'status-pill ' + (place.isOpen ? 'status-pill--open' : 'status-pill--closed')}>
-              <span /> {place.isOpen ? 'Buka sekarang' : 'Tutup sekarang'}
+          <div className="detail-heading__meta">
+            <span className="detail-heading__rating">
+              <Star size={14} fill="currentColor" aria-hidden="true" />
+              <strong>{place.rating}</strong>
+              <span>({place.reviewCount} ulasan)</span>
             </span>
-            <span className="label-pill">{halalLabels[place.halalStatus]}</span>
-            <span className="label-pill">{place.category}</span>
+            <span className="detail-heading__dot" aria-hidden="true">·</span>
+            <span className="detail-heading__area"><MapPin size={14} aria-hidden="true" /> {place.area}, Bandung</span>
+            <span className="detail-heading__dot" aria-hidden="true">·</span>
+            <span className={'detail-heading__status' + (place.isOpen ? ' is-open' : ' is-closed')}>
+              <span aria-hidden="true" /> {place.isOpen ? 'Buka sekarang' : 'Sedang tutup'}
+            </span>
           </div>
-          <div className="detail-actions">
-            <a className="button button--primary" href={routeUrl} target="_blank" rel="noreferrer">
-              <ExternalLink size={16} /> Dapatkan rute
-            </a>
-            <button
-              className={'button button--secondary favorite-button' + (isFavorite(place.id) ? ' is-saved' : '')}
-              type="button"
-              onClick={() => void handleFavoriteToggle()}
-              disabled={favoritesLoading}
-            >
-              <Heart size={16} fill={isFavorite(place.id) ? 'currentColor' : 'none'} />
-              {isFavorite(place.id) ? 'Tersimpan' : 'Simpan'}
-            </button>
-          </div>
-          {favoriteError && <div className="data-notice data-notice--error detail-action-error" role="alert">Favorit gagal disimpan: {favoriteError}</div>}
-          <div className="detail-report-actions"><ReportContentButton entityType="place" entityId={place.id} entityLabel="tempat ini" />{heroPhoto?.id && <ReportContentButton variant="photo" entityType="place_photo" entityId={heroPhoto.id} entityLabel="foto tempat ini" />}</div>
         </div>
+        <div className="detail-heading__actions">
+          <button
+            className={'detail-icon-button' + (isSaved ? ' is-saved' : '')}
+            type="button"
+            onClick={() => void handleFavoriteToggle()}
+            disabled={favoritesLoading}
+            aria-pressed={isSaved}
+            aria-label={isSaved ? 'Hapus dari favorit' : 'Simpan ke favorit'}
+          >
+            <Heart size={17} fill={isSaved ? 'currentColor' : 'none'} />
+            <span>{isSaved ? 'Tersimpan' : 'Simpan'}</span>
+          </button>
+          <a className="detail-icon-button" href={routeUrl} target="_blank" rel="noreferrer">
+            <Share2 size={16} aria-hidden="true" />
+            <span>Rute</span>
+          </a>
+        </div>
+      </header>
+      {favoriteError && <div className="data-notice data-notice--error detail-action-error" role="alert">Favorit gagal disimpan: {favoriteError}</div>}
+
+      <section className="detail-gallery" aria-label={'Galeri foto ' + place.name}>
+        <div className="detail-gallery__main" style={{ background: 'linear-gradient(135deg, ' + place.accent + ', #282522)' }}>
+          {heroPhoto && <img src={heroPhoto.url} alt={'Foto utama ' + place.name} />}
+          {!heroPhoto && <span className="detail-gallery__emoji" aria-hidden="true">{place.emoji}</span>}
+        </div>
+        <div className="detail-gallery__grid">
+          {sidePhotos.map((photo, index) => (
+            <figure key={photo.id} className="detail-gallery__cell">
+              <img src={photo.url} alt={photo.caption ?? 'Foto ' + place.name + ' ' + (index + 2)} loading="lazy" />
+              {index === sidePhotos.length - 1 && photoPool.length > 5 && (
+                <span className="detail-gallery__more">+{photoPool.length - 5} foto</span>
+              )}
+            </figure>
+          ))}
+          {sidePhotos.length === 0 && (
+            <div className="detail-gallery__cell detail-gallery__cell--placeholder" aria-hidden="true">
+              <span>{place.emoji}</span>
+            </div>
+          )}
+        </div>
+        <span className="detail-gallery__badge">
+          <Star size={11} fill="currentColor" aria-hidden="true" /> Favorit komunitas
+        </span>
       </section>
 
       <section className="detail-content-grid">
         <div className="detail-main-column">
-          <div className="detail-card detail-card--rating">
-            <div className="rating-big"><Star size={20} fill="currentColor" /> <strong>{place.rating}</strong><span>/ 5</span></div>
-            <div className="rating-copy"><strong>Disukai pengunjung</strong><span>{place.reviewCount} ulasan komunitas</span></div>
-            <a className="text-link" href="#ulasan-komunitas">Tulis ulasan ↗</a>
+          <div className="detail-host-row">
+            <div className="detail-host-row__copy">
+              <h2>{place.tagline}</h2>
+              <p>{halalLabels[place.halalStatus]} · {place.category} · {priceLabels[place.priceRange]}</p>
+            </div>
+            <span className="detail-host-row__avatar" aria-hidden="true">{place.emoji}</span>
           </div>
 
-          <div className="detail-card">
-            <div className="detail-card__heading"><span className="section-kicker">TENTANG TEMPAT</span><h2>Alasan untuk mampir</h2></div>
-            <p className="detail-description">{place.description}</p>
-            <div className="highlight-list">
-              {place.highlights.map((highlight) => <span key={highlight}><Check size={14} /> {highlight}</span>)}
+          <div className="detail-rating-hero">
+            <div className="detail-rating-hero__score">
+              <span className="detail-rating-hero__laurel" aria-hidden="true">❦</span>
+              <strong>{place.rating}</strong>
+              <span className="detail-rating-hero__laurel detail-rating-hero__laurel--flip" aria-hidden="true">❦</span>
             </div>
+            <p className="detail-rating-hero__tagline">Disukai pengunjung</p>
+            <p className="detail-rating-hero__sub">Berdasarkan {place.reviewCount} ulasan komunitas terverifikasi</p>
+            <a className="text-link" href="#ulasan-komunitas">Lihat semua ulasan</a>
+          </div>
+
+          <div className="detail-section">
+            <h2 className="detail-section__title">Alasan untuk mampir</h2>
+            <p className="detail-description">{place.description}</p>
+            <ul className="detail-amenity-list">
+              {place.highlights.map((highlight) => (
+                <li key={highlight}>
+                  <span className="detail-amenity-list__icon"><Check size={15} /></span>
+                  <span>{highlight}</span>
+                </li>
+              ))}
+            </ul>
           </div>
 
           <ReviewsSection placeId={place.id} onChanged={() => void loadPlace()} />
           <BusinessClaimCard placeId={place.id} />
+
+          <div className="detail-report-actions">
+            <Flag size={13} aria-hidden="true" />
+            <span>Menemukan masalah?</span>
+            <ReportContentButton entityType="place" entityId={place.id} entityLabel="tempat ini" />
+            {heroPhoto && approvedPhotos.length > 0 && (
+              <ReportContentButton variant="photo" entityType="place_photo" entityId={heroPhoto.id} entityLabel="foto tempat ini" />
+            )}
+          </div>
         </div>
 
         <aside className="detail-side-column">
-          <div className="detail-card info-card">
-            <div className="detail-card__heading"><span className="section-kicker">INFORMASI</span><h2>Rencanakan kunjungan</h2></div>
-            <div className="info-row"><MapPin size={17} /><div><span>Alamat</span><strong>{place.address}</strong></div></div>
-            <div className="info-row"><CalendarDays size={17} /><div><span>Area</span><strong>{place.area}, Bandung</strong></div></div>
-            <div className="info-row"><Clock3 size={17} /><div><span>Perkiraan harga</span><strong>{priceLabels[place.priceRange]}</strong></div></div>
-            {place.phone && <div className="info-row"><Phone size={17} /><div><span>Kontak</span><a href={`tel:${place.phone}`}><strong>{place.phone}</strong></a></div></div>}
-            {place.websiteUrl && <div className="info-row"><Globe2 size={17} /><div><span>Website</span><a href={place.websiteUrl} target="_blank" rel="noreferrer"><strong>{place.websiteUrl}</strong></a></div></div>}
-            {place.instagramUrl && <div className="info-row"><Instagram size={17} /><div><span>Instagram</span><a href={place.instagramUrl} target="_blank" rel="noreferrer"><strong>{place.instagramUrl}</strong></a></div></div>}
+          <div className="detail-sticky-card">
+            <div className="detail-sticky-card__price">
+              <span>{priceLabels[place.priceRange]}</span>
+              <small>per orang</small>
+            </div>
+
+            <div className="detail-sticky-card__status">
+              <span className={'status-pill ' + (place.isOpen ? 'status-pill--open' : 'status-pill--closed')}>
+                <span /> {place.isOpen ? 'Buka sekarang' : 'Tutup sekarang'}
+              </span>
+              <span className="label-pill">{halalLabels[place.halalStatus]}</span>
+            </div>
+
+            <a className="button button--primary button--full" href={routeUrl} target="_blank" rel="noreferrer">
+              <ExternalLink size={15} aria-hidden="true" /> Dapatkan rute
+            </a>
+            <button
+              className={'button button--secondary button--full' + (isSaved ? ' is-saved' : '')}
+              type="button"
+              onClick={() => void handleFavoriteToggle()}
+              disabled={favoritesLoading}
+            >
+              <Heart size={15} fill={isSaved ? 'currentColor' : 'none'} aria-hidden="true" />
+              {isSaved ? 'Tersimpan di favorit' : 'Simpan ke favorit'}
+            </button>
+
+            <p className="detail-sticky-card__note">Gratis untuk dikunjungi — kamu hanya membayar apa yang kamu pesan.</p>
+
+            <div className="detail-info-list">
+              <div className="detail-info-list__row">
+                <MapPin size={16} aria-hidden="true" />
+                <div>
+                  <span>Alamat</span>
+                  <strong>{place.address}</strong>
+                </div>
+              </div>
+              <div className="detail-info-list__row">
+                <CalendarDays size={16} aria-hidden="true" />
+                <div>
+                  <span>Area</span>
+                  <strong>{place.area}, Bandung</strong>
+                </div>
+              </div>
+              {place.phone && (
+                <div className="detail-info-list__row">
+                  <Phone size={16} aria-hidden="true" />
+                  <div>
+                    <span>Kontak</span>
+                    <a href={'tel:' + place.phone}><strong>{place.phone}</strong></a>
+                  </div>
+                </div>
+              )}
+              {place.websiteUrl && (
+                <div className="detail-info-list__row">
+                  <Globe2 size={16} aria-hidden="true" />
+                  <div>
+                    <span>Website</span>
+                    <a href={place.websiteUrl} target="_blank" rel="noreferrer"><strong>{place.websiteUrl}</strong></a>
+                  </div>
+                </div>
+              )}
+              {place.instagramUrl && (
+                <div className="detail-info-list__row">
+                  <Instagram size={16} aria-hidden="true" />
+                  <div>
+                    <span>Instagram</span>
+                    <a href={place.instagramUrl} target="_blank" rel="noreferrer"><strong>{place.instagramUrl}</strong></a>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="detail-card hours-card">
-            <div className="detail-card__heading"><span className="section-kicker">JAM BUKA</span><h2>Datang di waktu yang tepat</h2></div>
-            <div className="hours-list">
+          <div className="detail-hours-card">
+            <div className="detail-hours-card__heading">
+              <Clock3 size={16} aria-hidden="true" />
+              <h2>Jam buka</h2>
+            </div>
+            <div className="detail-hours-list">
               {dayOrder.map((day) => {
                 const hours = place.openingHours[day]
                 return (
-                  <div className="hours-row" key={day}>
+                  <div className="detail-hours-list__row" key={day}>
                     <span>{dayLabels[day]}</span>
-                    <strong>{hours.closed ? 'Tutup' : hours.open + ' – ' + hours.close}</strong>
+                    <strong className={hours.closed ? 'is-closed' : ''}>{hours.closed ? 'Tutup' : hours.open + ' – ' + hours.close}</strong>
                   </div>
                 )
               })}

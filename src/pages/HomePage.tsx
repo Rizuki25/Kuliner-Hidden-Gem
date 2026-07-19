@@ -1,4 +1,4 @@
-import { ChevronDown, Coffee, Search, SlidersHorizontal, Sparkles, Utensils } from 'lucide-react'
+import { ChevronDown, Coffee, MapPin, Search, SlidersHorizontal, Sparkles, Utensils } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { MapPreview } from '../components/MapPreview'
@@ -11,6 +11,17 @@ type CategoryFilter = 'Semua' | FoodCategory
 type HalalFilter = 'Semua' | HalalStatus
 type PriceFilter = 'Semua' | PriceRange
 
+const citySpots = [
+  { name: 'Dago', category: 'Kafe & Resto', count: 24, emoji: '🍜' },
+  { name: 'Braga', category: 'Jajanan Legendaris', count: 18, emoji: '🥮' },
+  { name: 'Cihapit', category: 'Warung Rumahan', count: 15, emoji: '🍲' },
+  { name: 'Buah Batu', category: 'Kuliner Malam', count: 12, emoji: '🌙' },
+  { name: 'Setiabudhi', category: 'Fine Dining Lokal', count: 9, emoji: '🍷' },
+  { name: 'Antapani', category: 'Kopi & Roti', count: 14, emoji: '☕' },
+]
+
+const marqueeItems = ['Sate', 'Batagor', 'Siomay', 'Bakso', 'Nasi Timbel', 'Kopi', 'Es Cendol', 'Pisang Goreng', 'Mie Kocok', 'Cireng', 'Seblak', 'Surabi']
+
 export function HomePage() {
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [places, setPlaces] = useState<Place[]>(mockPlaces)
@@ -22,6 +33,8 @@ export function HomePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [dataError, setDataError] = useState<string | undefined>()
   const [dataSource, setDataSource] = useState<'supabase' | 'mock'>('mock')
+  const [visibleSections, setVisibleSections] = useState<Record<string, boolean>>({})
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
 
   useEffect(() => {
     let isMounted = true
@@ -40,6 +53,25 @@ export function HomePage() {
       isMounted = false
     }
   }, [])
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setVisibleSections((prev) => ({ ...prev, [entry.target.id]: true }))
+          }
+        })
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+    )
+
+    Object.values(sectionRefs.current).forEach((el) => {
+      if (el) observer.observe(el)
+    })
+
+    return () => observer.disconnect()
+  }, [places])
 
   const filteredPlaces = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
@@ -71,22 +103,88 @@ export function HomePage() {
     setPrice('Semua')
   }
 
+  const setSectionRef = (id: string) => (el: HTMLElement | null) => {
+    sectionRefs.current[id] = el
+  }
+
+  const isVisible = (id: string) => visibleSections[id] ? 'is-visible' : ''
+
   return (
     <div className="page-width home-page">
-      <section className="hero-section">
+      {/* Animated background blobs */}
+      <div className="hero-blobs" aria-hidden="true">
+        <div className="hero-blob hero-blob--1" />
+        <div className="hero-blob hero-blob--2" />
+        <div className="hero-blob hero-blob--3" />
+      </div>
+
+      <section className="hero-section hero-section--animated" id="hero" ref={setSectionRef('hero')}>
         <div className="hero-copy">
-          <div className="eyebrow-row"><Sparkles size={15} /> Pilihan lokal Bandung</div>
-          <h1>Temukan rasa tersembunyi<br />di sekitar Bandung</h1>
-          <p>Warung kecil, kedai rumahan, dan rasa lokal yang layak kamu temukan.</p>
+          <div className="eyebrow-row animate-fade-in-up">
+            <Sparkles size={15} className="sparkle-icon" /> Pilihan lokal Bandung
+          </div>
+          <h1 className="animate-fade-in-up animate-delay-1">
+            Temukan rasa <em>tersembunyi</em><br />di sekitar Bandung
+          </h1>
+          <p className="animate-fade-in-up animate-delay-2">Warung kecil, kedai rumahan, dan rasa lokal yang layak kamu temukan. Setiap sudut kota punya cerita rasa.</p>
+          
+          <div className="hero-stats animate-fade-in-up animate-delay-3">
+            <div className="hero-stat">
+              <span className="hero-stat__number">{places.length}</span>
+              <span className="hero-stat__label">Tempat</span>
+            </div>
+            <div className="hero-stat__divider" />
+            <div className="hero-stat">
+              <span className="hero-stat__number">4.8</span>
+              <span className="hero-stat__label">Rating</span>
+            </div>
+            <div className="hero-stat__divider" />
+            <div className="hero-stat">
+              <span className="hero-stat__number">120+</span>
+              <span className="hero-stat__label">Ulasan</span>
+            </div>
+          </div>
         </div>
 
-        <div className="hero-aside" aria-label={`${places.length} tempat lokal`}>
-          <span className="hero-aside__number">{places.length.toString().padStart(2, '0')}</span>
-          <span className="hero-aside__label">tempat lokal<br />untuk dijelajahi</span>
+        <div className="hero-visual animate-fade-in-up animate-delay-2" aria-hidden="true">
+          <div className="hero-visual__card hero-visual__card--1">
+            <span className="hero-visual__emoji">🍜</span>
+            <div className="hero-visual__info">
+              <strong>Mie Kocok</strong>
+              <span>Dago</span>
+            </div>
+          </div>
+          <div className="hero-visual__card hero-visual__card--2">
+            <span className="hero-visual__emoji">☕</span>
+            <div className="hero-visual__info">
+              <strong>Kopi Susu</strong>
+              <span>Braga</span>
+            </div>
+          </div>
+          <div className="hero-visual__card hero-visual__card--3">
+            <span className="hero-visual__emoji">🥘</span>
+            <div className="hero-visual__info">
+              <strong>Nasi Timbel</strong>
+              <span>Cihapit</span>
+            </div>
+          </div>
+          <div className="hero-visual__ring hero-visual__ring--1" />
+          <div className="hero-visual__ring hero-visual__ring--2" />
         </div>
       </section>
 
-      <section className="search-box" aria-label="Cari kuliner">
+      {/* Marquee banner */}
+      <div className="marquee-banner" aria-hidden="true">
+        <div className="marquee-track">
+          {[...marqueeItems, ...marqueeItems].map((item, index) => (
+            <span className="marquee-item" key={index}>
+              <span className="marquee-dot" /> {item}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <section className="search-box search-box--elevated animate-scale-in" aria-label="Cari kuliner">
         <div className="search-box__main">
           <span className="search-box__label">Mau makan apa?</span>
           <input
@@ -120,17 +218,17 @@ export function HomePage() {
           <ChevronDown size={15} />
         </label>
 
-        <button className="search-orb" type="button" aria-label="Mulai pencarian" onClick={() => searchInputRef.current?.focus()}>
+        <button className="search-orb search-orb--pulse" type="button" aria-label="Mulai pencarian" onClick={() => searchInputRef.current?.focus()}>
           <Search size={19} strokeWidth={2.5} />
         </button>
       </section>
 
-      <section className="filter-section" aria-label="Filter kategori kuliner">
+      <section className="filter-section animate-fade-in-up" aria-label="Filter kategori kuliner" id="filters" ref={setSectionRef('filters')}>
         <div className="filter-section__label"><SlidersHorizontal size={16} /> Jelajahi</div>
         <div className="filter-group">
           {(['Semua', 'Makanan', 'Minuman'] as CategoryFilter[]).map((item) => (
             <button
-              className={`filter-chip${category === item ? ' is-active' : ''}`}
+              className={`filter-chip filter-chip--animated${category === item ? ' is-active' : ''}`}
               key={item}
               type="button"
               onClick={() => setCategory(item)}
@@ -157,7 +255,34 @@ export function HomePage() {
         <div className="data-notice" role="status">Data tersambung dari Supabase · Kota Bandung</div>
       )}
 
-      <section className="explore-grid">
+      {/* City exploration grid */}
+      <section className={`city-grid-section ${isVisible('cities')}`} id="cities" ref={setSectionRef('cities')}>
+        <div className="section-header">
+          <span className="section-kicker">Inspirasi untuk jelajah</span>
+          <h2>Area populer di Bandung</h2>
+        </div>
+        <div className="city-grid">
+          {citySpots.map((city, index) => (
+            <button
+              className={`city-card ${isVisible('cities')}`}
+              style={{ transitionDelay: `${index * 60}ms` }}
+              key={city.name}
+              type="button"
+              onClick={() => setQuery(city.name)}
+            >
+              <span className="city-card__emoji">{city.emoji}</span>
+              <div className="city-card__content">
+                <strong>{city.name}</strong>
+                <span>{city.category}</span>
+              </div>
+              <span className="city-card__count">{city.count} tempat</span>
+              <span className="city-card__arrow"><MapPin size={14} /></span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="explore-grid" id="results" ref={setSectionRef('results')}>
         <div className="results-panel" id="hasil-kuliner">
           <div className="results-panel__header">
             <div>
@@ -171,8 +296,14 @@ export function HomePage() {
             <div className="loading-state"><span className="loading-dot" /> Memuat kuliner Bandung...</div>
           ) : filteredPlaces.length > 0 ? (
             <div className="place-list">
-              {filteredPlaces.map((place) => (
-                <PlaceCard key={place.id} place={place} marketplace onSelect={handleCardSelect} />
+              {filteredPlaces.map((place, index) => (
+                <div
+                  className={`place-card-wrapper ${isVisible('results')}`}
+                  style={{ transitionDelay: `${index * 80}ms` }}
+                  key={place.id}
+                >
+                  <PlaceCard place={place} marketplace onSelect={handleCardSelect} />
+                </div>
               ))}
             </div>
           ) : (
@@ -188,13 +319,16 @@ export function HomePage() {
         <MapPreview places={filteredPlaces} selectedPlaceId={selectedPlace?.id} onSelect={setSelectedPlace} />
       </section>
 
-      <section className="contribute-banner">
+      <section className={`contribute-banner contribute-banner--animated ${isVisible('contribute')}`} id="contribute" ref={setSectionRef('contribute')}>
+        <div className="contribute-banner__glow" aria-hidden="true" />
         <div>
           <span className="section-kicker">Kenal tempat tersembunyi?</span>
           <h2>Bantu kami menemukan rasa berikutnya.</h2>
-          <p>Bantu orang lain menemukan tempat lokal yang layak dicoba.</p>
+          <p>Bantu orang lain menemukan tempat lokal yang layak dicoba. Setiap rekomendasi berarti.</p>
         </div>
-        <Link className="button button--light" to="/usulkan-tempat">Usulkan tempat <span>↗</span></Link>
+        <Link className="button button--light button--glow" to="/usulkan-tempat">
+          Usulkan tempat <span>↗</span>
+        </Link>
       </section>
     </div>
   )
