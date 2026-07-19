@@ -1,6 +1,7 @@
 import { ArrowLeft, CalendarDays, Check, Clock3, ExternalLink, Heart, MapPin, Star } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { BusinessClaimCard } from '../components/BusinessClaimCard'
 import { ReviewsSection } from '../components/ReviewsSection'
 import { useAuth } from '../context/AuthContext'
 import { useFavorites } from '../context/FavoritesContext'
@@ -128,6 +129,7 @@ export function PlaceDetailPage() {
           </div>
 
           <ReviewsSection placeId={place.id} onChanged={() => void loadPlace()} />
+          <BusinessClaimCard placeId={place.id} />
         </div>
 
         <aside className="detail-side-column">

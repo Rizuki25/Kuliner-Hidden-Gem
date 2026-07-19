@@ -30,9 +30,12 @@ npm.cmd run dev
 
 - Migration schema awal tersedia di `supabase/migrations/202607180001_initial_schema.sql`.
 - Migration foto kontribusi dan policy Storage tersedia di `supabase/migrations/202607180002_contribution_photos.sql`.
+- Hotfix akses foto publik tersedia di `supabase/migrations/202607190001_public_approved_photo_access.sql` dan `supabase/migrations/202607190002_public_approved_photo_policy_definer.sql`.
+- Migration klaim bisnis, bucket bukti kepemilikan, dan policy manager tersedia di `supabase/migrations/202607190003_business_claim_proofs_and_manager_policies.sql`.
 - Dokumentasi tabel dan aturan akses tersedia di `supabase/README.md`.
 - `.env.local` digunakan untuk URL project dan publishable key Supabase, serta diabaikan oleh Git.
 - Migration schema dan migration foto sudah dijalankan di project Supabase.
+- Migration klaim bisnis perlu dijalankan sebelum form klaim digunakan.
 - Supabase CLI belum tersedia di workspace, sehingga verifikasi langsung dari lokal belum dilakukan.
 
 ## Progress project
@@ -64,11 +67,15 @@ npm.cmd run dev
 - [x] Membuat panel admin aktif di `/admin` untuk approve, reject dengan alasan, edit, archive, dan restore usulan.
 - [x] Mempromosikan usulan yang disetujui ke `places`, `place_hours`, dan `place_photos`, serta mencatat aksi di `moderation_logs`.
 - [x] Menampilkan foto `place_photos` yang approved pada kartu beranda, favorit, dan halaman detail melalui signed URL.
+- [x] Memperbaiki policy Storage agar foto approved tetap dapat dibuatkan signed URL untuk pengunjung tanpa login.
 - [x] Mengganti pratinjau visual dengan peta interaktif Leaflet/OpenStreetMap menggunakan koordinat tempat, marker, zoom, tooltip, dan lokasi pengguna.
 - [x] Menambahkan geocoding alamat pada form usulan dengan hasil pencarian Nominatim serta pin peta yang dapat dipilih lewat klik dan digeser untuk koreksi manual.
 - [x] Menambahkan rating bintang dan form ulasan komunitas pada halaman detail tempat.
 - [x] Menampilkan ulasan approved serta menyediakan edit dan hapus ulasan milik user.
 - [x] Menambahkan antrean moderasi ulasan di panel admin untuk approve, reject, archive, dan restore.
+- [x] Menambahkan form pengajuan klaim kepemilikan bisnis pada halaman detail tempat.
+- [x] Menambahkan panel admin untuk memeriksa bukti, menyetujui, dan menolak klaim bisnis.
+- [x] Approval klaim otomatis memberikan akses manager dan role `owner` melalui trigger Supabase.
 
 ### Verifikasi yang sudah dilakukan
 
@@ -79,15 +86,23 @@ npm.cmd run dev
 
 ### Verifikasi fitur rating dan ulasan
 
-- [ ] User mengirim rating dan ulasan baru dari halaman detail.
-- [ ] Ulasan pending tidak tampil publik sebelum disetujui admin.
-- [ ] Admin approve, reject, archive, dan restore ulasan.
-- [ ] User dapat mengedit atau menghapus ulasannya sendiri.
-- [ ] Rating rata-rata dan jumlah ulasan berubah setelah approval atau penghapusan.
+- [x] User mengirim rating dan ulasan baru dari halaman detail.
+- [x] Ulasan pending tidak tampil publik sebelum disetujui admin.
+- [x] Admin approve, reject, archive, dan restore ulasan.
+- [x] User dapat mengedit atau menghapus ulasannya sendiri.
+- [x] Rating rata-rata dan jumlah ulasan berubah setelah approval atau penghapusan.
+
+### Verifikasi fitur klaim bisnis
+
+- [ ] User mengunggah bukti dan mengirim klaim dari halaman detail tempat.
+- [ ] Admin membuka bukti, lalu approve atau reject klaim dengan alasan.
+- [ ] Approval membuat record `place_managers` dan mengubah role user menjadi `owner`.
+- [ ] Klaim yang ditolak dapat diajukan ulang setelah alasan diperbaiki.
 
 ### Pekerjaan yang ditunda
 
 - [ ] Konfigurasi Google OAuth sampai domain production atau kebutuhan login Google sudah siap.
+- [ ] UI pengelolaan detail tempat oleh owner terverifikasi (jam buka, deskripsi, kontak, link, dan foto).
 
 ## Catatan integrasi data
 
@@ -100,10 +115,17 @@ npm.cmd run dev
 - Foto usulan di-upload ke bucket private `place-submission-photos`; foto yang sudah disetujui dipakai ulang oleh `place_photos`.
 - Riwayat kontribusi tersedia di `/kontribusi`; panel admin memerlukan role `admin` pada `profiles`.
 - Foto approved pada katalog publik diambil dari bucket private melalui signed URL; foto pending tetap tidak ditampilkan ke pengunjung.
+- Migration hotfix `supabase/migrations/202607190001_public_approved_photo_access.sql` memastikan foto approved dapat dibaca pengunjung tanpa membuka seluruh bucket.
 - Peta menggunakan Leaflet dengan tile OpenStreetMap dan tidak memerlukan Google Maps API key.
 - Form usulan menyediakan tombol pencarian alamat berbasis Nominatim; user tetap memilih hasil yang sesuai atau mengeklik peta untuk menempatkan pin sebelum mengirim.
 - Halaman detail menyediakan rating 1–5, ulasan pending milik user, daftar ulasan approved, serta edit/hapus ulasan sendiri.
 - Panel admin memuat antrean ulasan dari tabel `reviews`; perubahan status memicu perhitungan ulang `places.rating` dan `places.review_count` melalui trigger database.
+
+## Integrasi klaim bisnis
+
+- Pengajuan klaim bisnis memakai bucket private `business-claim-proofs`; bukti hanya dapat dibaca oleh pengaju dan admin melalui signed URL.
+- Panel admin memuat antrean klaim dari tabel `business_claims`; approval memicu sinkronisasi `place_managers` dan role `owner` melalui trigger database.
+- UI pengelolaan detail oleh owner terverifikasi masih menjadi subtahap berikutnya.
 
 ## Status authentication
 

@@ -1,6 +1,7 @@
 import {
   Archive,
   ArrowLeft,
+  BriefcaseBusiness,
   Check,
   CheckCircle2,
   ClipboardCheck,
@@ -19,6 +20,7 @@ import {
 } from 'lucide-react'
 import { FormEvent, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { BusinessClaimModerationPanel } from '../components/BusinessClaimModerationPanel'
 import { ReviewModerationPanel } from '../components/ReviewModerationPanel'
 import { useAuth } from '../context/AuthContext'
 import {
@@ -31,6 +33,7 @@ import {
   type SubmissionEditInput,
 } from '../lib/moderation'
 import { supabase } from '../lib/supabase'
+import type { BusinessClaimAdminRecord } from '../lib/claims'
 import type { ReviewModerationRecord } from '../lib/reviews'
 import {
   type PlaceSubmissionRecord,
@@ -174,7 +177,8 @@ export function AdminPage() {
   const [roleLoading, setRoleLoading] = useState(true)
   const [submissions, setSubmissions] = useState<PlaceSubmissionRecord[]>([])
   const [reviews, setReviews] = useState<ReviewModerationRecord[]>([])
-  const [stats, setStats] = useState<{ pendingSubmissions: number; pendingReviews: number; approvedPlaces: number }>()
+  const [claims, setClaims] = useState<BusinessClaimAdminRecord[]>([])
+  const [stats, setStats] = useState<{ pendingSubmissions: number; pendingReviews: number; pendingClaims: number; approvedPlaces: number }>()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string>()
   const [filter, setFilter] = useState<StatusFilter>('pending')
@@ -218,10 +222,12 @@ export function AdminPage() {
       setError(result.error)
       setSubmissions([])
       setReviews([])
+      setClaims([])
       setStats(undefined)
     } else {
       setSubmissions(result.submissions)
       setReviews(result.reviews)
+      setClaims(result.claims)
       setStats(result.stats)
     }
     setIsLoading(false)
@@ -356,6 +362,7 @@ export function AdminPage() {
       <div className="admin-stat-grid">
         <div className="admin-stat"><ClipboardCheck size={18} /><span>Usulan menunggu</span><strong>{String(stats?.pendingSubmissions ?? 0).padStart(2, '0')}</strong></div>
         <div className="admin-stat"><ShieldCheck size={18} /><span>Ulasan ditinjau</span><strong>{String(stats?.pendingReviews ?? 0).padStart(2, '0')}</strong></div>
+        <div className="admin-stat"><BriefcaseBusiness size={18} /><span>Klaim menunggu</span><strong>{String(stats?.pendingClaims ?? 0).padStart(2, '0')}</strong></div>
         <div className="admin-stat"><Database size={18} /><span>Tempat aktif</span><strong>{String(stats?.approvedPlaces ?? 0).padStart(2, '0')}</strong></div>
       </div>
 
@@ -399,6 +406,7 @@ export function AdminPage() {
         )}
       </section>
       <ReviewModerationPanel reviews={reviews} isLoading={isLoading} onRefresh={loadWorkspace} onError={setError} />
+      <BusinessClaimModerationPanel claims={claims} isLoading={isLoading} onRefresh={loadWorkspace} onError={setError} />
     </div>
   )
 }

@@ -214,6 +214,41 @@ h1 em, h2 em { color: var(--orange-dark); font-family: 'Playfair Display', serif
 .highlight-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
 .highlight-list span { display: inline-flex; align-items: center; gap: 5px; padding: 7px 9px; border-radius: 7px; color: #687653; background: #edf0e4; font-size: 11px; font-weight: 600; }
 .reviews-section { scroll-margin-top: 28px; }
+.business-claim-card { display: grid; gap: 16px; }
+.business-claim-card .detail-card__heading h2 { margin-bottom: 0; }
+.business-claim-card__login, .business-claim-card__status { display: flex; align-items: center; gap: 11px; padding: 13px; border-radius: 9px; }
+.business-claim-card__login { color: var(--orange); background: #f3efe7; }
+.business-claim-card__login > div, .business-claim-card__status > div { display: grid; gap: 3px; min-width: 0; }
+.business-claim-card__login > div { margin-right: auto; }
+.business-claim-card__login strong, .business-claim-card__status strong { color: var(--ink); font-size: 12px; }
+.business-claim-card__login span, .business-claim-card__status span { color: var(--muted); font-size: 11px; line-height: 1.45; }
+.business-claim-card__login .button { min-height: 34px; padding: 0 12px; font-size: 10px; }
+.business-claim-card__status svg { flex: 0 0 auto; }
+.business-claim-card__status--approved { color: #668050; background: #edf3e8; }
+.business-claim-card__status--pending { color: #8c6d3f; background: #f8eedb; }
+.business-claim-card__status--rejected { color: #9a6148; background: #fbefe8; }
+.business-claim-card__loading { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 11px; }
+.business-claim-card__message { margin: 0; }
+.business-claim-card__intro { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
+.business-claim-card__form { display: grid; gap: 14px; padding-top: 15px; border-top: 1px solid var(--line); }
+.business-claim-card__fields { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+.business-claim-card__fields label { display: grid; gap: 6px; color: var(--muted); font-size: 10px; font-weight: 700; }
+.business-claim-card__fields label > span { color: var(--ink); }
+.business-claim-card__fields input, .business-claim-card__fields textarea { width: 100%; border: 1px solid var(--line); border-radius: 8px; outline: 0; color: var(--ink); background: #fbf9f4; font-size: 11px; }
+.business-claim-card__fields input { min-height: 39px; padding: 0 10px; }
+.business-claim-card__fields textarea { padding: 9px 10px; line-height: 1.5; resize: vertical; }
+.business-claim-card__fields input:focus, .business-claim-card__fields textarea:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(221, 109, 67, .1); }
+.business-claim-card__field--wide { grid-column: 1 / -1; }
+.business-claim-card__file { position: relative; display: flex; align-items: center; gap: 10px; padding: 11px 12px; border: 1px dashed #d5c9b9; border-radius: 8px; color: var(--orange); background: #fcfaf5; cursor: pointer; }
+.business-claim-card__file:hover { border-color: var(--orange); background: #fff8ee; }
+.business-claim-card__file > span { display: grid; gap: 3px; min-width: 0; }
+.business-claim-card__file strong { overflow: hidden; color: var(--ink); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.business-claim-card__file small { color: var(--muted); font-size: 9px; }
+.business-claim-card__file input { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
+.business-claim-card__footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--soft-muted); font-family: 'DM Mono', monospace; font-size: 9px; line-height: 1.4; }
+.business-claim-card__footer .button { flex-shrink: 0; min-height: 35px; padding: 0 11px; font-size: 10px; }
+.business-claim-card__notice { display: flex; align-items: flex-start; gap: 7px; color: #8c6d3f; font-size: 10px; line-height: 1.5; }
+.business-claim-card__notice svg { flex: 0 0 auto; margin-top: 1px; }
 .review-stars { display: inline-flex; align-items: center; gap: 2px; color: #be8b3e; }
 .review-stars svg { flex-shrink: 0; }
 .review-stars--input { gap: 3px; }
@@ -267,6 +302,25 @@ h1 em, h2 em { color: var(--orange-dark); font-family: 'Playfair Display', serif
 .admin-review-card__contributor svg { color: var(--orange); }
 .admin-review-card__contributor strong { color: var(--ink); font-size: 11px; }
 .admin-review-card__contributor small { flex: 1 0 100%; overflow: hidden; padding-left: 20px; font-family: 'DM Mono', monospace; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
+.admin-claim-workspace { margin-top: 28px; }
+.admin-claim-list { display: grid; gap: 14px; }
+.admin-claim-card { overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+.admin-claim-card__body { display: grid; gap: 17px; padding: 17px; }
+.admin-claim-card__heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 15px; }
+.admin-claim-card__heading h3 { margin: 6px 0 0; color: var(--ink); font-size: 21px; letter-spacing: -.05em; }
+.admin-claim-card__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.admin-claim-card__grid > div { display: grid; gap: 4px; min-width: 0; }
+.admin-claim-card__grid span { color: var(--soft-muted); font-family: 'DM Mono', monospace; font-size: 9px; text-transform: uppercase; }
+.admin-claim-card__grid strong { overflow: hidden; color: var(--ink); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.admin-claim-card__grid small { overflow: hidden; color: var(--soft-muted); font-family: 'DM Mono', monospace; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
+.admin-claim-card__notes { margin: 0; padding: 10px 11px; border-radius: 8px; color: var(--muted); background: #f3efe7; font-size: 11px; line-height: 1.55; white-space: pre-wrap; }
+.admin-claim-card__proof { display: flex; align-items: center; gap: 9px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--orange); }
+.admin-claim-card__proof > div { display: grid; gap: 3px; min-width: 0; margin-right: auto; }
+.admin-claim-card__proof span { color: var(--soft-muted); font-family: 'DM Mono', monospace; font-size: 9px; text-transform: uppercase; }
+.admin-claim-card__proof strong { overflow: hidden; color: var(--ink); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.admin-claim-card__proof small { color: var(--soft-muted); font-size: 10px; }
+.admin-claim-card__proof .button { min-height: 33px; padding: 0 10px; font-size: 10px; }
+.admin-claim-card__approved { display: flex; align-items: center; gap: 7px; padding: 0 17px 17px; color: #668050; font-size: 10px; font-weight: 700; }
 .info-card, .hours-card { padding: 22px; }
 .info-row { display: flex; gap: 12px; padding: 14px 0; border-top: 1px solid var(--line); color: var(--orange); }
 .info-row div { display: flex; flex-direction: column; gap: 4px; }
@@ -379,7 +433,7 @@ h1 em, h2 em { color: var(--orange-dark); font-family: 'Playfair Display', serif
 
 .admin-page__heading { margin-bottom: 30px; text-align: left; }
 .admin-page__heading p { margin-left: 0; }
-.admin-stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.admin-stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 .admin-stat { min-height: 125px; display: flex; flex-direction: column; gap: 11px; padding: 20px; border: 1px solid var(--line); border-radius: 13px; background: var(--card); }
 .admin-stat svg { color: var(--orange); }
 .admin-stat span { color: var(--muted); font-size: 12px; }
@@ -565,6 +619,7 @@ h1 em, h2 em { color: var(--orange-dark); font-family: 'Playfair Display', serif
   .detail-hero__copy { padding: 0; }
   .detail-content-grid { grid-template-columns: 1fr; }
   .detail-side-column { grid-template-columns: 1fr 1fr; align-items: start; }
+  .admin-stat-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 620px) {
@@ -657,4 +712,13 @@ h1 em, h2 em { color: var(--orange-dark); font-family: 'Playfair Display', serif
   .review-form__footer > div { width: 100%; }
   .review-form__footer .button { flex: 1; }
   .admin-review-card__heading { align-items: flex-start; flex-direction: column; gap: 10px; }
+  .business-claim-card__login, .business-claim-card__status, .business-claim-card__footer { align-items: stretch; flex-direction: column; }
+  .business-claim-card__login > div { margin-right: 0; }
+  .business-claim-card__login .button, .business-claim-card__footer .button { width: 100%; }
+  .business-claim-card__fields { grid-template-columns: 1fr; }
+  .business-claim-card__field--wide { grid-column: auto; }
+  .admin-claim-card__grid { grid-template-columns: 1fr; }
+  .admin-claim-card__proof { align-items: flex-start; flex-wrap: wrap; }
+  .admin-claim-card__proof > div { flex: 1; }
+  .admin-claim-card__proof .button { flex-basis: 100%; width: 100%; }
 }

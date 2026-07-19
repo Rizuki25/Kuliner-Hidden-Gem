@@ -8,6 +8,18 @@ Migration lanjutan untuk foto kontribusi berada di:
 
 `supabase/migrations/202607180002_contribution_photos.sql`
 
+Hotfix akses foto approved untuk pengunjung berada di:
+
+`supabase/migrations/202607190001_public_approved_photo_access.sql`
+
+Jika signed URL masih mengembalikan `Object not found` untuk pengunjung, jalankan juga:
+
+`supabase/migrations/202607190002_public_approved_photo_policy_definer.sql`
+
+Migration klaim bisnis, bucket bukti kepemilikan, dan policy manager berada di:
+
+`supabase/migrations/202607190003_business_claim_proofs_and_manager_policies.sql`
+
 ## Isi schema
 
 | Tabel | Fungsi |
@@ -34,7 +46,10 @@ Migration lanjutan untuk foto kontribusi berada di:
 - User hanya dapat membaca atau mengubah data miliknya sendiri.
 - Admin memiliki akses moderasi penuh.
 - Approval klaim bisnis otomatis membuat record `place_managers` dan mengubah role user menjadi `owner`.
+- Bukti klaim bisnis disimpan di bucket private `business-claim-proofs`; folder teratas wajib sama dengan `auth.uid()`, dan admin dapat membuat signed URL untuk meninjaunya.
+- Manager terverifikasi dapat memperbarui data `places`, `place_hours`, dan `place_photos` sesuai policy. UI pengelolaan detail owner akan ditambahkan pada subtahap berikutnya.
 - Foto usulan disimpan di bucket private `place-submission-photos`. Folder teratas wajib sama dengan `auth.uid()`; user hanya dapat membaca foto miliknya, admin dapat membaca semua, dan foto yang sudah dipromosikan ke `place_photos` dapat dibuatkan signed URL untuk publik.
+- Foto pada `place_photos` dengan status approved dan tempat approved dapat dibuatkan signed URL oleh pengunjung tanpa login; foto pending tetap tidak dapat dibaca publik.
 - `halal_status` memiliki nilai `halal`, `non_halal`, dan `belum_terverifikasi`. Nilai ketiga menjaga agar data yang belum diverifikasi tidak dipaksa masuk ke label yang salah.
 - `day_of_week` menggunakan format PostgreSQL: `0` Minggu sampai `6` Sabtu.
 
@@ -61,6 +76,8 @@ where id = '<user_id_dari_auth_users>';
 ```
 
 Panel moderasi frontend tersedia di `/admin`. User dapat melihat riwayat kontribusi di `/kontribusi`.
+
+Jalankan migration klaim bisnis setelah migration foto dan hotfix foto publik. Form klaim tersedia pada halaman detail tempat ketika user sudah login. Admin meninjaunya dari bagian **Klaim bisnis** di `/admin`.
 
 ## Konfigurasi Google OAuth
 
