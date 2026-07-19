@@ -189,10 +189,10 @@ export function SuggestPlacePage() {
 
   if (!user) {
     return (
-      <div className="page-width centered-page">
+      <div className="page-width centered-page suggest-gate">
         <div className="centered-page__icon"><Plus size={24} /></div>
-        <span className="section-kicker">KONTRIBUSI KOMUNITAS</span>
-        <h1>Login diperlukan<br /><em>untuk berkontribusi.</em></h1>
+        <span className="section-kicker">Kontribusi komunitas</span>
+        <h1>Login diperlukan untuk berkontribusi</h1>
         <p>Masuk terlebih dahulu agar usulan tempat tercatat atas nama akunmu.</p>
         <div className="centered-page__actions">
           <Link className="button button--primary" to="/login?next=%2Fusulkan-tempat">Masuk untuk mulai <span>↗</span></Link>
@@ -204,10 +204,10 @@ export function SuggestPlacePage() {
 
   if (submitted) {
     return (
-      <div className="page-width centered-page">
+      <div className="page-width centered-page suggest-success">
         <div className="centered-page__icon centered-page__icon--success"><CheckCircle2 size={25} /></div>
-        <span className="section-kicker">USULAN TERKIRIM</span>
-        <h1>Terima kasih sudah<br /><em>berbagi temuan.</em></h1>
+        <span className="section-kicker">Usulan terkirim</span>
+        <h1>Terima kasih sudah berbagi temuan</h1>
         <p>Usulanmu sudah masuk dan akan ditinjau admin. Tempat baru akan tampil setelah disetujui.</p>
         <div className="centered-page__actions">
           <Link className="button button--primary" to="/">Kembali menjelajah</Link>
@@ -223,9 +223,11 @@ export function SuggestPlacePage() {
       <Link className="back-link" to="/"><ArrowLeft size={16} /> Kembali ke jelajah</Link>
       <div className="form-page__heading">
         <div className="centered-page__icon"><Plus size={24} /></div>
-        <span className="section-kicker">KONTRIBUSI KOMUNITAS</span>
-        <h1>Kenalkan tempat<br /><em>yang kamu sayang.</em></h1>
-        <p>Usulan akan ditinjau admin sebelum ditampilkan secara publik.</p>
+        <div>
+          <span className="section-kicker">Kontribusi komunitas</span>
+          <h1>Kenalkan tempat yang kamu sayang</h1>
+          <p>Usulan akan ditinjau admin sebelum ditampilkan secara publik.</p>
+        </div>
       </div>
 
       <form className="submission-form" onSubmit={(event) => void handleSubmit(event)}>

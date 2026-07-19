@@ -95,9 +95,9 @@ export function ReviewModerationPanel({ reviews, isLoading, onRefresh, onError }
   }
 
   return (
-    <section className="admin-workspace admin-review-workspace" aria-label="Daftar ulasan komunitas">
+    <section className="admin-workspace admin-review-workspace" id="moderasi-ulasan" aria-label="Daftar ulasan komunitas">
       <div className="admin-workspace__toolbar">
-        <div><span className="section-kicker">MODERASI ULASAN</span><h2>Ulasan komunitas</h2></div>
+        <div><span className="section-kicker">Moderasi ulasan</span><h2>Ulasan komunitas</h2></div>
         <label className="admin-search"><MessageCircle size={16} /><span className="sr-only">Cari ulasan</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Cari tempat, isi, atau user" /></label>
       </div>
       <div className="admin-filter-tabs" role="tablist" aria-label="Filter status ulasan">
@@ -116,7 +116,7 @@ export function ReviewModerationPanel({ reviews, isLoading, onRefresh, onError }
               <article className="admin-review-card" key={review.id}>
                 <div className="admin-review-card__topline"><ReviewStatusPill status={review.status} /><span>Dikirim {formatDate(review.createdAt)}</span></div>
                 <div className="admin-review-card__body">
-                  <div className="admin-review-card__heading"><div><span className="section-kicker">TEMPAT</span><h3>{review.placeName}</h3></div><ReviewRating rating={review.rating} /></div>
+                  <div className="admin-review-card__heading"><div><span className="section-kicker">Tempat</span><h3>{review.placeName}</h3></div><ReviewRating rating={review.rating} /></div>
                   <p className="admin-review-card__text">{review.body}</p>
                   <div className="admin-review-card__contributor"><UserRound size={14} /><span>Penulis</span><strong>{review.contributorName || 'Nama belum tersedia'}</strong><small>{review.userId}</small></div>
                 </div>

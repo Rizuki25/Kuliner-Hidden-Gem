@@ -111,7 +111,7 @@ export function BusinessClaimCard({ placeId }: BusinessClaimCardProps) {
       <div className="detail-card__heading"><span className="section-kicker">UNTUK PEMILIK USAHA</span><h2>Kelola tempat ini</h2></div>
 
       {isManager ? (
-        <div className="business-claim-card__status business-claim-card__status--approved"><ShieldCheck size={19} /><div><strong>Akunmu sudah terverifikasi</strong><span>Kamu tercatat sebagai pemilik tempat ini. Fitur pengelolaan detail akan tersedia pada tahap owner management.</span></div></div>
+        <div className="business-claim-card__status business-claim-card__status--approved"><ShieldCheck size={19} /><div><strong>Akunmu sudah terverifikasi</strong><span>Kamu dapat memperbarui informasi, jam buka, dan foto tempat ini.</span></div><Link className="button button--primary" to={`/kelola-tempat?place=${placeId}`}>Kelola tempat</Link></div>
       ) : claim ? <ClaimStatus claim={claim} /> : null}
 
       {error && <div className="data-notice data-notice--error business-claim-card__message" role="alert">{error}</div>}

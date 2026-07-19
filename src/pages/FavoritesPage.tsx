@@ -42,10 +42,10 @@ export function FavoritesPage() {
 
   if (!user) {
     return (
-      <div className="page-width centered-page">
+      <div className="page-width centered-page favorites-gate">
         <div className="centered-page__icon"><Heart size={24} /></div>
-        <span className="section-kicker">RUANG PERSONAL</span>
-        <h1>Simpan tempat<br /><em>yang ingin dicoba.</em></h1>
+        <span className="section-kicker">Favoritmu</span>
+        <h1>Simpan tempat yang ingin dicoba</h1>
         <p>Masuk untuk menyimpan kuliner favoritmu dan menemukannya lagi kapan saja.</p>
         <div className="centered-page__actions">
           <Link className="button button--primary" to="/login?next=%2Ffavorit"><LockKeyhole size={16} /> Masuk untuk melihat favorit</Link>
@@ -60,9 +60,12 @@ export function FavoritesPage() {
       <Link className="back-link" to="/"><ArrowLeft size={16} /> Kembali ke jelajah</Link>
       <div className="favorites-page__heading">
         <div className="centered-page__icon"><Heart size={24} /></div>
-        <span className="section-kicker">RUANG PERSONAL</span>
-        <h1>Tempat yang<br /><em>ingin kamu coba.</em></h1>
-        <p>Semua temuan favorit tersimpan di satu tempat.</p>
+        <div>
+          <span className="section-kicker">Koleksi pribadi</span>
+          <h1>Tempat yang ingin kamu coba</h1>
+          <p>Semua temuan favorit tersimpan di satu tempat.</p>
+        </div>
+        <span className="favorites-page__count">{places.length} tersimpan</span>
       </div>
 
       {isLoading ? (
@@ -78,7 +81,7 @@ export function FavoritesPage() {
         </div>
       ) : (
         <div className="favorites-list">
-          {places.map((place) => <PlaceCard key={place.id} place={place} />)}
+          {places.map((place) => <PlaceCard key={place.id} place={place} marketplace />)}
         </div>
       )}
     </div>

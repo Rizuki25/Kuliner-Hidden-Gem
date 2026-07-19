@@ -11,10 +11,12 @@ const navItems = [
 export function AppShell() {
   const location = useLocation()
   const isAdmin = location.pathname.startsWith('/admin')
+  const isHome = location.pathname === '/'
+  const usesMarketplaceTheme = isHome || location.pathname === '/favorit' || location.pathname === '/kontribusi' || location.pathname === '/usulkan-tempat' || isAdmin
   const { user, signOut } = useAuth()
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell${usesMarketplaceTheme ? ' app-shell--airbnb' : ''}${isHome ? ' app-shell--home' : ''}`}>
       <header className="topbar">
         <div className="topbar__inner page-width">
           <NavLink className="brand" to="/" aria-label="Kuliner Tersembunyi, halaman utama">

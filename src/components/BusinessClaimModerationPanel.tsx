@@ -83,9 +83,9 @@ export function BusinessClaimModerationPanel({ claims, isLoading, onRefresh, onE
   }
 
   return (
-    <section className="admin-workspace admin-claim-workspace" aria-label="Daftar klaim bisnis">
+    <section className="admin-workspace admin-claim-workspace" id="klaim-bisnis" aria-label="Daftar klaim bisnis">
       <div className="admin-workspace__toolbar">
-        <div><span className="section-kicker">VERIFIKASI PEMILIK</span><h2>Klaim bisnis</h2></div>
+        <div><span className="section-kicker">Verifikasi pemilik</span><h2>Klaim bisnis</h2></div>
         <label className="admin-search"><Search size={16} /><span className="sr-only">Cari klaim</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Cari tempat, nama, atau kontak" /></label>
       </div>
       <div className="admin-filter-tabs" role="tablist" aria-label="Filter status klaim bisnis">
@@ -104,7 +104,7 @@ export function BusinessClaimModerationPanel({ claims, isLoading, onRefresh, onE
               <article className="admin-claim-card" key={claim.id}>
                 <div className="admin-submission-card__topline"><ClaimStatusPill status={claim.status} /><span>Diajukan {formatDate(claim.createdAt)}</span></div>
                 <div className="admin-claim-card__body">
-                  <div className="admin-claim-card__heading"><div><span className="section-kicker">TEMPAT</span><h3>{claim.placeName}</h3></div><span className="admin-submission-card__id">#{claim.id.slice(0, 8)}</span></div>
+                  <div className="admin-claim-card__heading"><div><span className="section-kicker">Tempat</span><h3>{claim.placeName}</h3></div><span className="admin-submission-card__id">#{claim.id.slice(0, 8)}</span></div>
                   <div className="admin-claim-card__grid">
                     <div><span>Penanggung jawab</span><strong>{claim.contactName}</strong></div>
                     <div><span>Nomor kontak</span><strong>{claim.contactPhone}</strong></div>

@@ -35,7 +35,7 @@ npm.cmd run dev
 - Dokumentasi tabel dan aturan akses tersedia di `supabase/README.md`.
 - `.env.local` digunakan untuk URL project dan publishable key Supabase, serta diabaikan oleh Git.
 - Migration schema dan migration foto sudah dijalankan di project Supabase.
-- Migration klaim bisnis perlu dijalankan sebelum form klaim digunakan.
+- Migration klaim bisnis sudah dijalankan dan diuji di project Supabase.
 - Supabase CLI belum tersedia di workspace, sehingga verifikasi langsung dari lokal belum dilakukan.
 
 ## Progress project
@@ -76,6 +76,7 @@ npm.cmd run dev
 - [x] Menambahkan form pengajuan klaim kepemilikan bisnis pada halaman detail tempat.
 - [x] Menambahkan panel admin untuk memeriksa bukti, menyetujui, dan menolak klaim bisnis.
 - [x] Approval klaim otomatis memberikan akses manager dan role `owner` melalui trigger Supabase.
+- [x] Menambahkan UI owner di `/kelola-tempat` untuk mengubah deskripsi, kontak, link, jam buka, dan foto tempat terverifikasi.
 
 ### Verifikasi yang sudah dilakukan
 
@@ -83,6 +84,7 @@ npm.cmd run dev
 2. [x] Menjalankan migration `supabase/migrations/202607180002_contribution_photos.sql` di project Supabase.
 3. [x] Mengatur minimal satu akun admin dengan role `admin` melalui SQL Editor.
 4. [x] Menguji peta asli dan marker tempat dari koordinat Supabase.
+5. [x] Menguji pengajuan, upload bukti, approve, reject, dan pengajuan ulang klaim bisnis.
 
 ### Verifikasi fitur rating dan ulasan
 
@@ -94,15 +96,21 @@ npm.cmd run dev
 
 ### Verifikasi fitur klaim bisnis
 
-- [ ] User mengunggah bukti dan mengirim klaim dari halaman detail tempat.
-- [ ] Admin membuka bukti, lalu approve atau reject klaim dengan alasan.
-- [ ] Approval membuat record `place_managers` dan mengubah role user menjadi `owner`.
-- [ ] Klaim yang ditolak dapat diajukan ulang setelah alasan diperbaiki.
+- [x] User mengunggah bukti dan mengirim klaim dari halaman detail tempat.
+- [x] Admin membuka bukti, lalu approve atau reject klaim dengan alasan.
+- [x] Approval membuat record `place_managers` dan mengubah role user menjadi `owner`.
+- [x] Klaim yang ditolak dapat diajukan ulang setelah alasan diperbaiki.
+
+### Verifikasi fitur pengelolaan owner
+
+- [ ] Owner membuka `/kelola-tempat` dan hanya melihat tempat yang memiliki manager aktif.
+- [ ] Owner memperbarui deskripsi, kontak, link, dan jam buka.
+- [ ] Owner mengunggah foto, mengganti foto sampul, dan menghapus foto.
+- [ ] Perubahan owner tampil pada halaman publik tempat.
 
 ### Pekerjaan yang ditunda
 
 - [ ] Konfigurasi Google OAuth sampai domain production atau kebutuhan login Google sudah siap.
-- [ ] UI pengelolaan detail tempat oleh owner terverifikasi (jam buka, deskripsi, kontak, link, dan foto).
 
 ## Catatan integrasi data
 

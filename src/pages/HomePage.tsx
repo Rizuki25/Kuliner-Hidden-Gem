@@ -1,5 +1,5 @@
-import { ChevronDown, MapPin, Search, SlidersHorizontal, Sparkles } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { ChevronDown, Coffee, Search, SlidersHorizontal, Sparkles, Utensils } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { MapPreview } from '../components/MapPreview'
 import { PlaceCard } from '../components/PlaceCard'
@@ -12,6 +12,7 @@ type HalalFilter = 'Semua' | HalalStatus
 type PriceFilter = 'Semua' | PriceRange
 
 export function HomePage() {
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const [places, setPlaces] = useState<Place[]>(mockPlaces)
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<CategoryFilter>('Semua')
@@ -56,49 +57,76 @@ export function HomePage() {
 
   const activeFilterCount = [category !== 'Semua', halal !== 'Semua', price !== 'Semua'].filter(Boolean).length
 
-  function handleSelect(place: Place) {
+  function handleCardSelect(place: Place) {
     setSelectedPlace(place)
     window.setTimeout(() => {
-      document.getElementById('hasil-kuliner')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      document.getElementById('peta-kuliner')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }, 0)
+  }
+
+  function resetFilters() {
+    setQuery('')
+    setCategory('Semua')
+    setHalal('Semua')
+    setPrice('Semua')
   }
 
   return (
     <div className="page-width home-page">
       <section className="hero-section">
         <div className="hero-copy">
-          <div className="eyebrow-row"><Sparkles size={15} /> BANDUNG, JAWA BARAT</div>
-          <h1>Rasa lokal,<br /><em>cerita baru.</em></h1>
-          <p>Temukan tempat makan kecil yang membuat Bandung terasa lebih dekat.</p>
+          <div className="eyebrow-row"><Sparkles size={15} /> Pilihan lokal Bandung</div>
+          <h1>Temukan rasa tersembunyi<br />di sekitar Bandung</h1>
+          <p>Warung kecil, kedai rumahan, dan rasa lokal yang layak kamu temukan.</p>
         </div>
 
-        <div className="hero-aside">
+        <div className="hero-aside" aria-label={`${places.length} tempat lokal`}>
           <span className="hero-aside__number">{places.length.toString().padStart(2, '0')}</span>
-          <span className="hero-aside__label">tempat contoh<br />di sekitar Bandung</span>
+          <span className="hero-aside__label">tempat lokal<br />untuk dijelajahi</span>
         </div>
       </section>
 
       <section className="search-box" aria-label="Cari kuliner">
         <div className="search-box__main">
-          <Search size={20} />
+          <span className="search-box__label">Mau makan apa?</span>
           <input
+            ref={searchInputRef}
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Cari nama tempat, makanan, atau area..."
+            placeholder="Cari tempat, menu, atau area"
             aria-label="Cari nama tempat, makanan, atau area"
           />
-          <span className="search-shortcut">⌘ K</span>
         </div>
-        <button className="location-button" type="button">
-          <MapPin size={16} />
-          <span>Lokasi saya</span>
+
+        <label className="search-box__segment">
+          <span className="search-box__label">Kisaran harga</span>
+          <select value={price} onChange={(event) => setPrice(event.target.value as PriceFilter)}>
+            <option value="Semua">Semua harga</option>
+            <option value="murah">Di bawah 25K</option>
+            <option value="sedang">25K–60K</option>
+            <option value="mahal">Di atas 60K</option>
+          </select>
           <ChevronDown size={15} />
+        </label>
+
+        <label className="search-box__segment">
+          <span className="search-box__label">Preferensi</span>
+          <select value={halal} onChange={(event) => setHalal(event.target.value as HalalFilter)}>
+            <option value="Semua">Semua label</option>
+            <option value="halal">Halal</option>
+            <option value="non-halal">Non-halal</option>
+          </select>
+          <ChevronDown size={15} />
+        </label>
+
+        <button className="search-orb" type="button" aria-label="Mulai pencarian" onClick={() => searchInputRef.current?.focus()}>
+          <Search size={19} strokeWidth={2.5} />
         </button>
       </section>
 
-      <section className="filter-section" aria-label="Filter kuliner">
-        <div className="filter-section__label"><SlidersHorizontal size={16} /> Filter</div>
+      <section className="filter-section" aria-label="Filter kategori kuliner">
+        <div className="filter-section__label"><SlidersHorizontal size={16} /> Jelajahi</div>
         <div className="filter-group">
           {(['Semua', 'Makanan', 'Minuman'] as CategoryFilter[]).map((item) => (
             <button
@@ -107,40 +135,14 @@ export function HomePage() {
               type="button"
               onClick={() => setCategory(item)}
             >
+              {item === 'Semua' ? <Sparkles size={15} /> : item === 'Makanan' ? <Utensils size={15} /> : <Coffee size={15} />}
               {item}
             </button>
           ))}
         </div>
-        <label className="filter-select">
-          <span className="sr-only">Filter harga</span>
-          <select value={price} onChange={(event) => setPrice(event.target.value as PriceFilter)}>
-            <option value="Semua">Semua harga</option>
-            <option value="murah">Di bawah 25K</option>
-            <option value="sedang">25K–60K</option>
-            <option value="mahal">Di atas 60K</option>
-          </select>
-          <ChevronDown size={14} />
-        </label>
-        <label className="filter-select">
-          <span className="sr-only">Filter label halal</span>
-          <select value={halal} onChange={(event) => setHalal(event.target.value as HalalFilter)}>
-            <option value="Semua">Semua label</option>
-            <option value="halal">Halal</option>
-            <option value="non-halal">Non-halal</option>
-          </select>
-          <ChevronDown size={14} />
-        </label>
         {activeFilterCount > 0 && (
-          <button
-            className="clear-filter"
-            type="button"
-            onClick={() => {
-              setCategory('Semua')
-              setHalal('Semua')
-              setPrice('Semua')
-            }}
-          >
-            Reset ({activeFilterCount})
+          <button className="clear-filter" type="button" onClick={resetFilters}>
+            Reset filter ({activeFilterCount})
           </button>
         )}
       </section>
@@ -156,15 +158,13 @@ export function HomePage() {
       )}
 
       <section className="explore-grid">
-        <MapPreview places={filteredPlaces} selectedPlaceId={selectedPlace?.id} onSelect={handleSelect} />
-
         <div className="results-panel" id="hasil-kuliner">
           <div className="results-panel__header">
             <div>
-              <span className="section-kicker">PILIHAN UNTUKMU</span>
-              <h2>Di sekitar Bandung</h2>
+              <span className="section-kicker">Pilihan untukmu</span>
+              <h2>Kuliner tersembunyi di Bandung</h2>
             </div>
-            <span className="result-count">{filteredPlaces.length.toString().padStart(2, '0')} tempat</span>
+            <span className="result-count">{filteredPlaces.length} tempat ditemukan</span>
           </div>
 
           {isLoading ? (
@@ -172,7 +172,7 @@ export function HomePage() {
           ) : filteredPlaces.length > 0 ? (
             <div className="place-list">
               {filteredPlaces.map((place) => (
-                <PlaceCard key={place.id} place={place} onSelect={handleSelect} />
+                <PlaceCard key={place.id} place={place} marketplace onSelect={handleCardSelect} />
               ))}
             </div>
           ) : (
@@ -180,21 +180,18 @@ export function HomePage() {
               <span className="empty-state__icon">⌕</span>
               <h3>Belum ada yang cocok</h3>
               <p>Coba ganti kata kunci atau kurangi filter pencarianmu.</p>
-              <button className="button button--secondary" type="button" onClick={() => {
-                setQuery('')
-                setCategory('Semua')
-                setHalal('Semua')
-                setPrice('Semua')
-              }}>Tampilkan semua</button>
+              <button className="button button--secondary" type="button" onClick={resetFilters}>Tampilkan semua</button>
             </div>
           )}
         </div>
+
+        <MapPreview places={filteredPlaces} selectedPlaceId={selectedPlace?.id} onSelect={setSelectedPlace} />
       </section>
 
       <section className="contribute-banner">
         <div>
-          <span className="section-kicker">KENAL TEMPAT TERSEMBUNYI?</span>
-          <h2>Bagikan rasa favoritmu.</h2>
+          <span className="section-kicker">Kenal tempat tersembunyi?</span>
+          <h2>Bantu kami menemukan rasa berikutnya.</h2>
           <p>Bantu orang lain menemukan tempat lokal yang layak dicoba.</p>
         </div>
         <Link className="button button--light" to="/usulkan-tempat">Usulkan tempat <span>↗</span></Link>

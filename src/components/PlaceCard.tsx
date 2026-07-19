@@ -5,16 +5,21 @@ import { halalLabels, type Place } from '../types/place'
 type PlaceCardProps = {
   place: Place
   compact?: boolean
+  marketplace?: boolean
   onSelect?: (place: Place) => void
 }
 
-export function PlaceCard({ place, compact = false, onSelect }: PlaceCardProps) {
+export function PlaceCard({ place, compact = false, marketplace = false, onSelect }: PlaceCardProps) {
   return (
-    <article className={`place-card${compact ? ' place-card--compact' : ''}`}>
+    <article className={`place-card${compact ? ' place-card--compact' : ''}${marketplace ? ' place-card--marketplace' : ''}`}>
       <button
         className="place-card__visual"
         type="button"
-        style={{ background: `linear-gradient(135deg, ${place.accent}, #272522)` }}
+        style={{
+          background: marketplace && !place.photoUrls?.[0]
+            ? '#f2f2f2'
+            : `linear-gradient(135deg, ${place.accent}, #272522)`,
+        }}
         onClick={() => onSelect?.(place)}
         aria-label={`Pilih ${place.name}`}
       >

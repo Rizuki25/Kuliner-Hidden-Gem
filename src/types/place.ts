@@ -35,6 +35,9 @@ export type Place = {
   lng: number
   isOpen: boolean
   description: string
+  phone?: string
+  websiteUrl?: string
+  instagramUrl?: string
   highlights: string[]
   openingHours: Record<DayKey, OpeningHour>
   photoUrls?: string[]

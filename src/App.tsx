@@ -6,6 +6,7 @@ import { FavoritesPage } from './pages/FavoritesPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage } from './pages/NotFoundPage'
+import { OwnerManagementPage } from './pages/OwnerManagementPage'
 import { PlaceDetailPage } from './pages/PlaceDetailPage'
 import { SuggestPlacePage } from './pages/SuggestPlacePage'
 
@@ -20,6 +21,7 @@ function App() {
         <Route path="login" element={<LoginPage />} />
         <Route path="usulkan-tempat" element={<SuggestPlacePage />} />
         <Route path="admin" element={<AdminPage />} />
+        <Route path="kelola-tempat" element={<OwnerManagementPage />} />
         <Route path="404" element={<NotFoundPage />} />
         <Route path="*" element={<Navigate to="/404" replace />} />
       </Route>

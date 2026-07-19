@@ -47,7 +47,7 @@ Migration klaim bisnis, bucket bukti kepemilikan, dan policy manager berada di:
 - Admin memiliki akses moderasi penuh.
 - Approval klaim bisnis otomatis membuat record `place_managers` dan mengubah role user menjadi `owner`.
 - Bukti klaim bisnis disimpan di bucket private `business-claim-proofs`; folder teratas wajib sama dengan `auth.uid()`, dan admin dapat membuat signed URL untuk meninjaunya.
-- Manager terverifikasi dapat memperbarui data `places`, `place_hours`, dan `place_photos` sesuai policy. UI pengelolaan detail owner akan ditambahkan pada subtahap berikutnya.
+- Manager terverifikasi dapat memperbarui data `places`, `place_hours`, dan `place_photos` sesuai policy. UI pengelolaan tersedia di route `/kelola-tempat`.
 - Foto usulan disimpan di bucket private `place-submission-photos`. Folder teratas wajib sama dengan `auth.uid()`; user hanya dapat membaca foto miliknya, admin dapat membaca semua, dan foto yang sudah dipromosikan ke `place_photos` dapat dibuatkan signed URL untuk publik.
 - Foto pada `place_photos` dengan status approved dan tempat approved dapat dibuatkan signed URL oleh pengunjung tanpa login; foto pending tetap tidak dapat dibaca publik.
 - `halal_status` memiliki nilai `halal`, `non_halal`, dan `belum_terverifikasi`. Nilai ketiga menjaga agar data yang belum diverifikasi tidak dipaksa masuk ke label yang salah.

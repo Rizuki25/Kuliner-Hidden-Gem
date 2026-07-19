@@ -26,6 +26,9 @@ type SupabasePlaceRow = {
   price_range: 'murah' | 'sedang' | 'mahal' | 'tidak_diketahui'
   halal_status: 'halal' | 'non_halal' | 'belum_terverifikasi'
   description: string | null
+  phone: string | null
+  website_url: string | null
+  instagram_url: string | null
   address: string
   area: string | null
   latitude: number
@@ -169,6 +172,9 @@ export function mapSupabasePlace(row: SupabasePlaceRow): Place {
     lng: Number(row.longitude),
     isOpen: isOpenNow(openingHours),
     description: row.description ?? getTagline(row.description),
+    phone: row.phone ?? undefined,
+    websiteUrl: row.website_url ?? undefined,
+    instagramUrl: row.instagram_url ?? undefined,
     highlights: [],
     openingHours,
   }
@@ -182,6 +188,9 @@ const placeSelect = `
   price_range,
   halal_status,
   description,
+  phone,
+  website_url,
+  instagram_url,
   address,
   area,
   latitude,

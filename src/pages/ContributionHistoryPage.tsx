@@ -55,7 +55,7 @@ function SubmissionCard({ submission }: { submission: PlaceSubmissionRecord }) {
         )}
         <div className="contribution-card__copy">
           <div className="contribution-card__title-row">
-            <div><span className="section-kicker">{submission.category === 'makanan' ? 'MAKANAN' : 'MINUMAN'}</span><h2>{submission.name}</h2></div>
+            <div><span className="section-kicker">{submission.category === 'makanan' ? 'Makanan' : 'Minuman'}</span><h2>{submission.name}</h2></div>
             <span className="contribution-card__id">#{submission.id.slice(0, 8)}</span>
           </div>
           <p>{submission.address}{submission.area ? ` · ${submission.area}` : ''}</p>
@@ -99,10 +99,10 @@ export function ContributionHistoryPage() {
 
   if (!user) {
     return (
-      <div className="page-width centered-page">
+      <div className="page-width centered-page contribution-gate">
         <div className="centered-page__icon"><History size={24} /></div>
-        <span className="section-kicker">RIWAYAT KONTRIBUSI</span>
-        <h1>Semua temuanmu<br /><em>tersimpan di sini.</em></h1>
+        <span className="section-kicker">Riwayat kontribusi</span>
+        <h1>Semua temuanmu tersimpan di sini</h1>
         <p>Masuk terlebih dahulu untuk melihat status usulan tempat yang pernah kamu kirim.</p>
         <div className="centered-page__actions">
           <Link className="button button--primary" to="/login?next=%2Fkontribusi">Masuk untuk melihat</Link>
@@ -117,11 +117,14 @@ export function ContributionHistoryPage() {
       <Link className="back-link" to="/"><ArrowLeft size={16} /> Kembali ke jelajah</Link>
       <div className="contribution-page__heading">
         <div>
-          <span className="section-kicker">RUANG KONTRIBUSI</span>
-          <h1>Jejak temuan<br /><em>yang kamu bagikan.</em></h1>
+          <span className="section-kicker">Kontribusimu</span>
+          <h1>Jejak tempat yang kamu bagikan</h1>
           <p>Pantau proses pemeriksaan setiap usulan tempat dari satu ruang.</p>
         </div>
-        <Link className="button button--primary" to="/usulkan-tempat"><Plus size={16} /> Usulkan tempat</Link>
+        <div className="contribution-page__actions">
+          <span>{submissions.length} usulan</span>
+          <Link className="button button--primary" to="/usulkan-tempat"><Plus size={16} /> Usulkan tempat</Link>
+        </div>
       </div>
 
       {error && <div className="data-notice data-notice--error" role="alert">{error}</div>}

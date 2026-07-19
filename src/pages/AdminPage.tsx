@@ -325,10 +325,10 @@ export function AdminPage() {
 
   if (!user) {
     return (
-      <div className="page-width centered-page">
+      <div className="page-width centered-page admin-gate">
         <div className="centered-page__icon"><ShieldCheck size={24} /></div>
-        <span className="section-kicker">WORKSPACE ADMIN</span>
-        <h1>Masuk untuk<br /><em>membuka panel.</em></h1>
+        <span className="section-kicker">Workspace admin</span>
+        <h1>Masuk untuk membuka panel</h1>
         <p>Panel moderasi hanya dapat diakses oleh akun yang memiliki role admin di Supabase.</p>
         <div className="centered-page__actions"><Link className="button button--primary" to="/login?next=%2Fadmin">Masuk sebagai admin</Link><Link className="back-link" to="/"><ArrowLeft size={15} /> Kembali ke halaman publik</Link></div>
       </div>
@@ -339,10 +339,10 @@ export function AdminPage() {
 
   if (role !== 'admin') {
     return (
-      <div className="page-width centered-page">
+      <div className="page-width centered-page admin-restricted">
         <div className="centered-page__icon centered-page__icon--danger"><ShieldAlert size={24} /></div>
-        <span className="section-kicker">AKSES TERBATAS</span>
-        <h1>Panel ini khusus<br /><em>untuk admin.</em></h1>
+        <span className="section-kicker">Akses terbatas</span>
+        <h1>Panel ini khusus untuk admin</h1>
         <p>Akun {user.email ?? 'aktif'} belum memiliki role admin. Minta admin utama mengatur role di tabel profiles.</p>
         <div className="centered-page__actions"><Link className="button button--secondary" to="/"><ArrowLeft size={15} /> Kembali ke halaman publik</Link></div>
       </div>
@@ -353,7 +353,7 @@ export function AdminPage() {
     <div className="page-width admin-page">
       <Link className="back-link" to="/"><ArrowLeft size={16} /> Kembali ke halaman publik</Link>
       <div className="admin-page__heading admin-page__heading--workspace">
-        <div><span className="section-kicker">WORKSPACE ADMIN</span><h1>Jaga kualitas<br /><em>setiap temuan.</em></h1><p>Periksa data, foto, dan cerita komunitas sebelum masuk ke katalog Bandung.</p></div>
+        <div><span className="section-kicker">Workspace admin</span><h1>Jaga kualitas setiap temuan</h1><p>Periksa data, foto, dan cerita komunitas sebelum masuk ke katalog Bandung.</p></div>
         <button className="button button--secondary" type="button" onClick={() => void loadWorkspace()} disabled={isLoading}><RefreshCw size={15} className={isLoading ? 'spin' : undefined} /> Segarkan</button>
       </div>
 
@@ -366,9 +366,15 @@ export function AdminPage() {
         <div className="admin-stat"><Database size={18} /><span>Tempat aktif</span><strong>{String(stats?.approvedPlaces ?? 0).padStart(2, '0')}</strong></div>
       </div>
 
-      <section className="admin-workspace" aria-label="Daftar usulan tempat">
+      <nav className="admin-section-nav" aria-label="Navigasi workspace admin">
+        <a href="#moderasi-usulan"><ClipboardCheck size={16} /> Usulan tempat</a>
+        <a href="#moderasi-ulasan"><ShieldCheck size={16} /> Ulasan</a>
+        <a href="#klaim-bisnis"><BriefcaseBusiness size={16} /> Klaim bisnis</a>
+      </nav>
+
+      <section className="admin-workspace" id="moderasi-usulan" aria-label="Daftar usulan tempat">
         <div className="admin-workspace__toolbar">
-          <div><span className="section-kicker">MODERASI KONTRIBUSI</span><h2>Daftar usulan</h2></div>
+          <div><span className="section-kicker">Moderasi kontribusi</span><h2>Daftar usulan</h2></div>
           <label className="admin-search"><Search size={16} /><span className="sr-only">Cari usulan</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Cari nama, area, atau kontributor" /></label>
         </div>
         <div className="admin-filter-tabs" role="tablist" aria-label="Filter status usulan">

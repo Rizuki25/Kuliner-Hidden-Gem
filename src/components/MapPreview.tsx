@@ -169,7 +169,7 @@ export function MapPreview({ places, selectedPlaceId, onSelect }: MapPreviewProp
   }
 
   return (
-    <section className="map-panel" aria-label="Peta kuliner Bandung">
+    <section className="map-panel" id="peta-kuliner" aria-label="Peta kuliner Bandung">
       <div className="map-panel__header">
         <div>
           <span className="section-kicker">PETA AREA</span>

@@ -1,4 +1,4 @@
-import { ArrowLeft, CalendarDays, Check, Clock3, ExternalLink, Heart, MapPin, Star } from 'lucide-react'
+import { ArrowLeft, CalendarDays, Check, Clock3, ExternalLink, Globe2, Heart, Instagram, MapPin, Phone, Star } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { BusinessClaimCard } from '../components/BusinessClaimCard'
@@ -138,6 +138,9 @@ export function PlaceDetailPage() {
             <div className="info-row"><MapPin size={17} /><div><span>Alamat</span><strong>{place.address}</strong></div></div>
             <div className="info-row"><CalendarDays size={17} /><div><span>Area</span><strong>{place.area}, Bandung</strong></div></div>
             <div className="info-row"><Clock3 size={17} /><div><span>Perkiraan harga</span><strong>{priceLabels[place.priceRange]}</strong></div></div>
+            {place.phone && <div className="info-row"><Phone size={17} /><div><span>Kontak</span><a href={`tel:${place.phone}`}><strong>{place.phone}</strong></a></div></div>}
+            {place.websiteUrl && <div className="info-row"><Globe2 size={17} /><div><span>Website</span><a href={place.websiteUrl} target="_blank" rel="noreferrer"><strong>{place.websiteUrl}</strong></a></div></div>}
+            {place.instagramUrl && <div className="info-row"><Instagram size={17} /><div><span>Instagram</span><a href={place.instagramUrl} target="_blank" rel="noreferrer"><strong>{place.instagramUrl}</strong></a></div></div>}
           </div>
 
           <div className="detail-card hours-card">
