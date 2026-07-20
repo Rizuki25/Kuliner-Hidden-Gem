@@ -134,7 +134,12 @@ export function PlaceDetailPage() {
 
       <section className="detail-gallery" aria-label={'Galeri foto ' + place.name}>
         <div className="detail-gallery__main" style={{ background: 'linear-gradient(135deg, ' + place.accent + ', #282522)' }}>
-          {heroPhoto && <img src={heroPhoto.url} alt={'Foto utama ' + place.name} />}
+          {heroPhoto && (
+            <>
+              <img className="detail-gallery__backdrop" src={heroPhoto.url} alt="" aria-hidden="true" />
+              <img className="detail-gallery__image" src={heroPhoto.url} alt={'Foto utama ' + place.name} />
+            </>
+          )}
           {!heroPhoto && <span className="detail-gallery__emoji" aria-hidden="true">{place.emoji}</span>}
         </div>
         <div className="detail-gallery__grid">

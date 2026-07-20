@@ -93,9 +93,14 @@ export function HomePage() {
 
   function handleCardSelect(place: Place) {
     setSelectedPlace(place)
-    window.setTimeout(() => {
-      document.getElementById('peta-kuliner')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }, 0)
+
+    // The map is already visible beside the cards on larger screens. Only
+    // move to it on smaller screens where it appears below the result list.
+    if (window.matchMedia('(max-width: 900px)').matches) {
+      window.setTimeout(() => {
+        document.getElementById('peta-kuliner')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 0)
+    }
   }
 
   function resetFilters() {

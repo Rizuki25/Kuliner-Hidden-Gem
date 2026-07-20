@@ -15,7 +15,7 @@ export function AppShell() {
   const isHome = location.pathname === '/'
   const isPlaceDetail = location.pathname.startsWith('/tempat/')
   const prefersQuietBackground = ['/login', '/lupa-password', '/reset-password', '/profil', '/usulkan-tempat', '/admin', '/kelola-tempat'].some((path) => location.pathname.startsWith(path))
-  const usesMarketplaceTheme = isHome || isPlaceDetail || location.pathname === '/favorit' || location.pathname === '/kontribusi' || location.pathname === '/usulkan-tempat' || isAdmin
+  const usesMarketplaceTheme = isHome || isPlaceDetail || location.pathname === '/favorit' || location.pathname === '/kontribusi' || location.pathname === '/profil' || location.pathname === '/usulkan-tempat' || isAdmin
   const { user, signOut } = useAuth()
 
   return (
