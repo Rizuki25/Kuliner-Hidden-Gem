@@ -48,6 +48,32 @@ export type PlaceLoadResult = {
   error?: string
 }
 
+export type PlaceStats = {
+  placeCount: number
+  averageRating: number
+  reviewCount: number
+}
+
+/**
+ * Summarizes the approved places returned by the public directory query.
+ * Ratings are weighted by each place's approved review count so the result
+ * represents the average of all approved reviews, rather than an average of
+ * place averages.
+ */
+export function summarizePlaces(places: Place[]): PlaceStats {
+  const reviewCount = places.reduce((total, place) => total + place.reviewCount, 0)
+  const ratingPoints = places.reduce(
+    (total, place) => total + place.rating * place.reviewCount,
+    0,
+  )
+
+  return {
+    placeCount: places.length,
+    averageRating: reviewCount > 0 ? Number((ratingPoints / reviewCount).toFixed(1)) : 0,
+    reviewCount,
+  }
+}
+
 const dayKeys: DayKey[] = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu']
 
 const defaultHours = (): Record<DayKey, OpeningHour> => ({

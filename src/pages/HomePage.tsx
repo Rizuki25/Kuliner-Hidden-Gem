@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { MapPreview } from '../components/MapPreview'
 import { PlaceCard } from '../components/PlaceCard'
 import { mockPlaces } from '../data/mockPlaces'
-import { fetchPlaces } from '../lib/places'
+import { fetchPlaces, summarizePlaces, type PlaceStats } from '../lib/places'
 import type { FoodCategory, HalalStatus, Place, PriceRange } from '../types/place'
 
 type CategoryFilter = 'Semua' | FoodCategory
@@ -33,6 +33,7 @@ export function HomePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [dataError, setDataError] = useState<string | undefined>()
   const [dataSource, setDataSource] = useState<'supabase' | 'mock'>('mock')
+  const [stats, setStats] = useState<PlaceStats>(() => summarizePlaces(mockPlaces))
   const [visibleSections, setVisibleSections] = useState<Record<string, boolean>>({})
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
 
@@ -44,6 +45,7 @@ export function HomePage() {
       const nextPlaces = result.places ?? []
       setPlaces(nextPlaces)
       setSelectedPlace(nextPlaces[0])
+      setStats(summarizePlaces(nextPlaces))
       setDataSource(result.source)
       setDataError(result.error)
       setIsLoading(false)
@@ -130,17 +132,17 @@ export function HomePage() {
           
           <div className="hero-stats animate-fade-in-up animate-delay-3">
             <div className="hero-stat">
-              <span className="hero-stat__number">{places.length}</span>
+              <span className="hero-stat__number">{stats.placeCount}</span>
               <span className="hero-stat__label">Tempat</span>
             </div>
             <div className="hero-stat__divider" />
             <div className="hero-stat">
-              <span className="hero-stat__number">4.8</span>
+              <span className="hero-stat__number">{stats.averageRating > 0 ? stats.averageRating.toFixed(1) : '—'}</span>
               <span className="hero-stat__label">Rating</span>
             </div>
             <div className="hero-stat__divider" />
             <div className="hero-stat">
-              <span className="hero-stat__number">120+</span>
+              <span className="hero-stat__number">{stats.reviewCount}</span>
               <span className="hero-stat__label">Ulasan</span>
             </div>
           </div>

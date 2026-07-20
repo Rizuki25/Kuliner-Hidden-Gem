@@ -2506,3 +2506,205 @@ h1 em, h2 em { color: var(--orange-dark); font-family: 'Playfair Display', serif
   .app-shell--home .city-card { width: 100%; }
   .app-shell--home .city-card__arrow { display: none; }
 }
+
+/* Refined discovery cards for the homepage. */
+.app-shell--home .place-card--marketplace {
+  border-radius: 16px;
+  background: transparent;
+  transition: transform .24s ease;
+}
+
+.app-shell--home .place-card--marketplace:hover {
+  transform: translateY(-5px);
+}
+
+.app-shell--home .place-card--marketplace .place-card__visual {
+  isolation: isolate;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .08);
+  transition: box-shadow .24s ease, transform .24s ease;
+}
+
+.app-shell--home .place-card--marketplace:hover .place-card__visual {
+  box-shadow: 0 16px 30px rgba(0, 0, 0, .14);
+}
+
+.app-shell--home .place-card--marketplace .place-card__visual::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, .08), transparent 34%, rgba(0, 0, 0, .24));
+  pointer-events: none;
+}
+
+.app-shell--home .place-card--marketplace .place-card__noise {
+  z-index: 2;
+  opacity: .08;
+}
+
+.app-shell--home .place-card--marketplace .place-card__photo-wash {
+  z-index: 1;
+}
+
+.app-shell--home .place-card--marketplace .place-card__eyebrow,
+.app-shell--home .place-card--marketplace .place-card__halal {
+  top: 14px;
+  padding: 7px 11px;
+  border: 1px solid rgba(255, 255, 255, .68);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
+  backdrop-filter: blur(8px);
+}
+
+.app-shell--home .place-card--marketplace .place-card__eyebrow {
+  color: #fff;
+  background: rgba(34, 34, 34, .42);
+}
+
+.app-shell--home .place-card--marketplace .place-card__halal {
+  color: #fff;
+  background: rgba(34, 34, 34, .42);
+}
+
+.app-shell--home .place-card--marketplace .place-card__visual-caption {
+  position: absolute;
+  z-index: 3;
+  right: 14px;
+  bottom: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: calc(100% - 28px);
+  overflow: hidden;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, .35);
+}
+
+.app-shell--home .place-card--marketplace .place-card__visual-caption svg {
+  flex: 0 0 auto;
+}
+
+.app-shell--home .place-card--marketplace .place-card__body {
+  padding: 15px 2px 0;
+}
+
+.app-shell--home .place-card--marketplace .place-card__heading {
+  align-items: center;
+  gap: 12px;
+}
+
+.app-shell--home .place-card--marketplace .place-card__area {
+  margin-bottom: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .01em;
+}
+
+.app-shell--home .place-card--marketplace h3 {
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: -.025em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-shell--home .place-card--marketplace .rating {
+  gap: 4px;
+  color: var(--home-ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.app-shell--home .place-card--marketplace .rating svg {
+  width: 14px;
+  height: 14px;
+  color: #e05a42;
+}
+
+.app-shell--home .place-card--marketplace .rating small {
+  color: var(--home-muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.app-shell--home .place-card--marketplace .place-card__tagline {
+  min-height: 38px;
+  margin: 7px 0 10px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.app-shell--home .place-card--marketplace .place-card__meta {
+  gap: 9px;
+  padding-top: 10px;
+  border-top: 1px solid #eeeeee;
+  font-size: 10px;
+}
+
+.app-shell--home .place-card--marketplace .place-card__meta span {
+  gap: 5px;
+}
+
+.app-shell--home .place-card--marketplace .place-card__meta svg {
+  width: 13px;
+  height: 13px;
+  color: #9a9a9a;
+}
+
+.app-shell--home .place-card--marketplace .place-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 34px;
+  margin-top: 8px;
+}
+
+.app-shell--home .place-card--marketplace .place-card__price {
+  overflow: hidden;
+  color: var(--home-muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-shell--home .place-card--marketplace .text-link {
+  flex: 0 0 auto;
+  margin-top: 0;
+  padding: 5px 0;
+  color: var(--home-ink);
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.app-shell--home .place-card--marketplace .text-link svg {
+  transition: transform .2s ease;
+}
+
+.app-shell--home .place-card--marketplace .text-link:hover {
+  color: var(--home-primary);
+}
+
+.app-shell--home .place-card--marketplace .text-link:hover svg {
+  transform: translate(2px, -2px);
+}
+
+@media (max-width: 743px) {
+  .app-shell--home .place-card--marketplace:hover {
+    transform: none;
+  }
+
+  .app-shell--home .place-card--marketplace .place-card__visual {
+    border-radius: 15px;
+  }
+
+  .app-shell--home .place-card--marketplace .place-card__body {
+    padding-top: 13px;
+  }
+}
+

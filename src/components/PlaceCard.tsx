@@ -1,6 +1,6 @@
 import { ArrowUpRight, Clock3, MapPin, Star } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { halalLabels, type Place } from '../types/place'
+import { halalLabels, priceLabels, type Place } from '../types/place'
 
 type PlaceCardProps = {
   place: Place
@@ -16,9 +16,7 @@ export function PlaceCard({ place, compact = false, marketplace = false, onSelec
         className="place-card__visual"
         type="button"
         style={{
-          background: marketplace && !place.photoUrls?.[0]
-            ? '#f2f2f2'
-            : `linear-gradient(135deg, ${place.accent}, #272522)`,
+          background: `linear-gradient(135deg, ${place.accent}, ${marketplace ? '#f7f7f7' : '#272522'})`,
         }}
         onClick={() => onSelect?.(place)}
         aria-label={`Pilih ${place.name}`}
@@ -29,6 +27,9 @@ export function PlaceCard({ place, compact = false, marketplace = false, onSelec
         {!place.photoUrls?.[0] && <span className="place-card__emoji" aria-hidden="true">{place.emoji}</span>}
         <span className="place-card__eyebrow">{place.category}</span>
         <span className="place-card__halal">{halalLabels[place.halalStatus]}</span>
+        <span className="place-card__visual-caption" aria-hidden="true">
+          <MapPin size={12} /> {place.area}
+        </span>
       </button>
 
       <div className="place-card__body">
@@ -37,16 +38,19 @@ export function PlaceCard({ place, compact = false, marketplace = false, onSelec
             <p className="place-card__area">{place.area}</p>
             <h3>{place.name}</h3>
           </div>
-          <span className="rating"><Star size={13} fill="currentColor" /> {place.rating}</span>
+          <span className="rating" aria-label={`Rating ${place.rating} dari 5, ${place.reviewCount} ulasan`}><Star size={13} fill="currentColor" /> {place.rating} <small>({place.reviewCount})</small></span>
         </div>
         <p className="place-card__tagline">{place.tagline}</p>
         <div className="place-card__meta">
           <span><MapPin size={13} /> {place.distanceKm === undefined ? 'Bandung' : `${place.distanceKm.toFixed(1)} km`}</span>
           <span className={place.isOpen ? 'is-open' : 'is-closed'}><Clock3 size={13} /> {place.isOpen ? 'Buka sekarang' : 'Tutup'}</span>
         </div>
-        <Link className="text-link" to={`/tempat/${place.id}`}>
-          Lihat detail <ArrowUpRight size={14} />
-        </Link>
+        <div className="place-card__footer">
+          <span className="place-card__price">{priceLabels[place.priceRange]}</span>
+          <Link className="text-link" to={`/tempat/${place.id}`}>
+            Lihat detail <ArrowUpRight size={14} />
+          </Link>
+        </div>
       </div>
     </article>
   )
