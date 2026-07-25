@@ -1,4 +1,5 @@
 import { ArrowUpRight, Clock3, MapPin, Star } from 'lucide-react'
+import { motion } from 'motion/react'
 import { Link } from 'react-router-dom'
 import { halalLabels, priceLabels, type Place } from '../types/place'
 
@@ -11,8 +12,12 @@ type PlaceCardProps = {
 
 export function PlaceCard({ place, compact = false, marketplace = false, onSelect }: PlaceCardProps) {
   return (
-    <article className={`place-card${compact ? ' place-card--compact' : ''}${marketplace ? ' place-card--marketplace' : ''}`}>
-      <button
+    <motion.article
+      className={`place-card${compact ? ' place-card--compact' : ''}${marketplace ? ' place-card--marketplace' : ''}`}
+      whileHover={marketplace ? { y: -6 } : undefined}
+      transition={{ duration: .28, ease: [.22, 1, .36, 1] }}
+    >
+      <motion.button
         className="place-card__visual"
         type="button"
         style={{
@@ -20,17 +25,18 @@ export function PlaceCard({ place, compact = false, marketplace = false, onSelec
         }}
         onClick={() => onSelect?.(place)}
         aria-label={`Pilih ${place.name}`}
+        whileTap={{ scale: .985 }}
       >
         {place.photoUrls?.[0] && <img className="place-card__photo" src={place.photoUrls[0]} alt={`Foto ${place.name}`} />}
         {place.photoUrls?.[0] && <span className="place-card__photo-wash" aria-hidden="true" />}
-        <span className="place-card__noise" />
+        <span className="place-card__noise" aria-hidden="true" />
         {!place.photoUrls?.[0] && <span className="place-card__emoji" aria-hidden="true">{place.emoji}</span>}
         <span className="place-card__eyebrow">{place.category}</span>
         <span className="place-card__halal">{halalLabels[place.halalStatus]}</span>
         <span className="place-card__visual-caption" aria-hidden="true">
           <MapPin size={12} /> {place.area}
         </span>
-      </button>
+      </motion.button>
 
       <div className="place-card__body">
         <div className="place-card__heading">
@@ -52,6 +58,6 @@ export function PlaceCard({ place, compact = false, marketplace = false, onSelec
           </Link>
         </div>
       </div>
-    </article>
+    </motion.article>
   )
 }

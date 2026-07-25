@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
+import { MotionConfig } from 'motion/react'
 import { AppShell } from './components/layout/AppShell'
 import { AdminPage } from './pages/AdminPage'
 import { ContributionHistoryPage } from './pages/ContributionHistoryPage'
@@ -15,23 +16,25 @@ import { SuggestPlacePage } from './pages/SuggestPlacePage'
 
 function App() {
   return (
-    <Routes>
-      <Route element={<AppShell />}>
-        <Route index element={<HomePage />} />
-        <Route path="tempat/:placeId" element={<PlaceDetailPage />} />
-        <Route path="favorit" element={<FavoritesPage />} />
-        <Route path="kontribusi" element={<ContributionHistoryPage />} />
-        <Route path="login" element={<LoginPage />} />
-        <Route path="lupa-password" element={<ForgotPasswordPage />} />
-        <Route path="reset-password" element={<ResetPasswordPage />} />
-        <Route path="profil" element={<ProfilePage />} />
-        <Route path="usulkan-tempat" element={<SuggestPlacePage />} />
-        <Route path="admin" element={<AdminPage />} />
-        <Route path="kelola-tempat" element={<OwnerManagementPage />} />
-        <Route path="404" element={<NotFoundPage />} />
-        <Route path="*" element={<Navigate to="/404" replace />} />
-      </Route>
-    </Routes>
+    <MotionConfig reducedMotion="user">
+      <Routes>
+        <Route element={<AppShell />}>
+          <Route index element={<HomePage />} />
+          <Route path="tempat/:placeId" element={<PlaceDetailPage />} />
+          <Route path="favorit" element={<FavoritesPage />} />
+          <Route path="kontribusi" element={<ContributionHistoryPage />} />
+          <Route path="login" element={<LoginPage />} />
+          <Route path="lupa-password" element={<ForgotPasswordPage />} />
+          <Route path="reset-password" element={<ResetPasswordPage />} />
+          <Route path="profil" element={<ProfilePage />} />
+          <Route path="usulkan-tempat" element={<SuggestPlacePage />} />
+          <Route path="admin" element={<AdminPage />} />
+          <Route path="kelola-tempat" element={<OwnerManagementPage />} />
+          <Route path="404" element={<NotFoundPage />} />
+          <Route path="*" element={<Navigate to="/404" replace />} />
+        </Route>
+      </Routes>
+    </MotionConfig>
   )
 }
 
