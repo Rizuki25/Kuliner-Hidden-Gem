@@ -19,7 +19,7 @@ export function AppShell() {
   const { user, signOut } = useAuth()
 
   return (
-    <div className={`app-shell${usesMarketplaceTheme ? ' app-shell--airbnb' : ''}${isHome ? ' app-shell--home' : ''}${prefersQuietBackground ? ' app-shell--quiet-background' : ''}`}>
+    <div className={`app-shell${usesMarketplaceTheme ? ' app-shell--airbnb' : ''}${isHome ? ' app-shell--home' : ''}${isPlaceDetail ? ' app-shell--detail' : ''}${prefersQuietBackground ? ' app-shell--quiet-background' : ''}`}>
       <InteractiveBackground />
       <header className="topbar">
         <div className="topbar__inner page-width">

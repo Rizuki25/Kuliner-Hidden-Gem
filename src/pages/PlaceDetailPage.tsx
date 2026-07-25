@@ -1,4 +1,25 @@
-import { ArrowLeft, CalendarDays, Check, ChevronRight, Clock3, ExternalLink, Flag, Globe2, Heart, Instagram, MapPin, Phone, Share2, Star } from 'lucide-react'
+import {
+  ArrowLeft,
+  CalendarDays,
+  Check,
+  CheckCircle2,
+  ChevronRight,
+  CircleDollarSign,
+  Clock3,
+  Flag,
+  Globe2,
+  Heart,
+  Images,
+  Instagram,
+  MapPin,
+  Navigation,
+  Phone,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  UtensilsCrossed,
+} from 'lucide-react'
+import { motion, type Variants } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { BusinessClaimCard } from '../components/BusinessClaimCard'
@@ -7,9 +28,28 @@ import { ReviewsSection } from '../components/ReviewsSection'
 import { useAuth } from '../context/AuthContext'
 import { useFavorites } from '../context/FavoritesContext'
 import { fetchPlaceById } from '../lib/places'
-import type { Place } from '../types/place'
+import type { DayKey, Place } from '../types/place'
 import { dayLabels, dayOrder, halalLabels, priceLabels } from '../types/place'
 import { NotFoundPage } from './NotFoundPage'
+
+const reveal: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: .65, ease: [.22, 1, .36, 1] },
+  },
+}
+
+const pageStagger: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: .075, delayChildren: .04 } },
+}
+
+function getTodayKey(): DayKey {
+  const dayIndex = new Date().getDay()
+  return dayOrder[(dayIndex + 6) % 7]
+}
 
 export function PlaceDetailPage() {
   const { placeId } = useParams()
@@ -83,56 +123,86 @@ export function PlaceDetailPage() {
   const galleryPhotos = photoPool.slice(0, 5)
   const heroPhoto = galleryPhotos[0]
   const sidePhotos = galleryPhotos.slice(1, 5)
+  const placeholderCount = Math.max(0, 4 - sidePhotos.length)
   const isSaved = isFavorite(place.id)
+  const todayKey = getTodayKey()
 
   return (
-    <div className="page-width detail-page">
-      <nav className="detail-breadcrumb" aria-label="Jejak navigasi">
+    <motion.div
+      className="page-width detail-page"
+      initial="hidden"
+      animate="visible"
+      variants={pageStagger}
+    >
+      <motion.nav className="detail-breadcrumb" aria-label="Jejak navigasi" variants={reveal}>
         <Link className="detail-breadcrumb__link" to="/"><ArrowLeft size={14} /> Jelajah</Link>
         <ChevronRight size={13} aria-hidden="true" />
         <span>{place.area}</span>
         <ChevronRight size={13} aria-hidden="true" />
         <strong>{place.name}</strong>
-      </nav>
+      </motion.nav>
 
-      <header className="detail-heading">
+      <motion.header className="detail-heading" variants={reveal}>
         <div className="detail-heading__copy">
+          <div className="detail-heading__eyebrow">
+            <span><Sparkles size={12} /> Pilihan lokal</span>
+            <span>{place.category}</span>
+            <span>{halalLabels[place.halalStatus]}</span>
+          </div>
           <h1>{place.name}</h1>
+          <p className="detail-heading__tagline">{place.tagline}</p>
           <div className="detail-heading__meta">
-            <span className="detail-heading__rating">
+            <a className="detail-heading__rating" href="#ulasan-komunitas">
               <Star size={14} fill="currentColor" aria-hidden="true" />
               <strong>{place.rating}</strong>
-              <span>({place.reviewCount} ulasan)</span>
-            </span>
-            <span className="detail-heading__dot" aria-hidden="true">·</span>
+              <span>{place.reviewCount} ulasan</span>
+            </a>
             <span className="detail-heading__area"><MapPin size={14} aria-hidden="true" /> {place.area}, Bandung</span>
-            <span className="detail-heading__dot" aria-hidden="true">·</span>
             <span className={'detail-heading__status' + (place.isOpen ? ' is-open' : ' is-closed')}>
               <span aria-hidden="true" /> {place.isOpen ? 'Buka sekarang' : 'Sedang tutup'}
             </span>
           </div>
         </div>
+
         <div className="detail-heading__actions">
-          <button
+          <motion.button
             className={'detail-icon-button' + (isSaved ? ' is-saved' : '')}
             type="button"
             onClick={() => void handleFavoriteToggle()}
             disabled={favoritesLoading}
             aria-pressed={isSaved}
             aria-label={isSaved ? 'Hapus dari favorit' : 'Simpan ke favorit'}
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: .97 }}
           >
             <Heart size={17} fill={isSaved ? 'currentColor' : 'none'} />
             <span>{isSaved ? 'Tersimpan' : 'Simpan'}</span>
-          </button>
-          <a className="detail-icon-button" href={routeUrl} target="_blank" rel="noreferrer">
-            <Share2 size={16} aria-hidden="true" />
-            <span>Rute</span>
-          </a>
+          </motion.button>
+          <motion.a
+            className="detail-icon-button detail-icon-button--primary"
+            href={routeUrl}
+            target="_blank"
+            rel="noreferrer"
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: .97 }}
+          >
+            <Navigation size={16} aria-hidden="true" />
+            <span>Buka rute</span>
+          </motion.a>
         </div>
-      </header>
-      {favoriteError && <div className="data-notice data-notice--error detail-action-error" role="alert">Favorit gagal disimpan: {favoriteError}</div>}
+      </motion.header>
 
-      <section className="detail-gallery" aria-label={'Galeri foto ' + place.name}>
+      {favoriteError && (
+        <div className="data-notice data-notice--error detail-action-error" role="alert">
+          Favorit gagal disimpan: {favoriteError}
+        </div>
+      )}
+
+      <motion.section
+        className="detail-gallery"
+        aria-label={'Galeri foto ' + place.name}
+        variants={reveal}
+      >
         <div className="detail-gallery__main" style={{ background: 'linear-gradient(135deg, ' + place.accent + ', #282522)' }}>
           {heroPhoto && (
             <>
@@ -142,6 +212,7 @@ export function PlaceDetailPage() {
           )}
           {!heroPhoto && <span className="detail-gallery__emoji" aria-hidden="true">{place.emoji}</span>}
         </div>
+
         <div className="detail-gallery__grid">
           {sidePhotos.map((photo, index) => (
             <figure key={photo.id} className="detail-gallery__cell">
@@ -151,40 +222,68 @@ export function PlaceDetailPage() {
               )}
             </figure>
           ))}
-          {sidePhotos.length === 0 && (
-            <div className="detail-gallery__cell detail-gallery__cell--placeholder" aria-hidden="true">
+          {Array.from({ length: placeholderCount }).map((_, index) => (
+            <div className="detail-gallery__cell detail-gallery__cell--placeholder" aria-hidden="true" key={'placeholder-' + index}>
               <span>{place.emoji}</span>
             </div>
-          )}
+          ))}
         </div>
+
         <span className="detail-gallery__badge">
           <Star size={11} fill="currentColor" aria-hidden="true" /> Favorit komunitas
         </span>
-      </section>
+        <span className="detail-gallery__counter">
+          <Images size={13} aria-hidden="true" /> {photoPool.length > 0 ? `${photoPool.length} foto` : 'Visual tempat'}
+        </span>
+      </motion.section>
+
+      <motion.section className="detail-summary-strip" aria-label="Ringkasan tempat" variants={reveal}>
+        <a className="detail-summary-item" href="#ulasan-komunitas">
+          <span className="detail-summary-item__icon"><Star size={18} fill="currentColor" /></span>
+          <span>
+            <small>Rating komunitas</small>
+            <strong>{place.rating} <em>· {place.reviewCount} ulasan</em></strong>
+          </span>
+        </a>
+        <div className="detail-summary-item">
+          <span className="detail-summary-item__icon"><CircleDollarSign size={19} /></span>
+          <span>
+            <small>Kisaran harga</small>
+            <strong>{priceLabels[place.priceRange]}</strong>
+          </span>
+        </div>
+        <div className="detail-summary-item">
+          <span className="detail-summary-item__icon"><UtensilsCrossed size={18} /></span>
+          <span>
+            <small>Jenis tempat</small>
+            <strong>{place.category}</strong>
+          </span>
+        </div>
+        <div className="detail-summary-item">
+          <span className="detail-summary-item__icon"><ShieldCheck size={19} /></span>
+          <span>
+            <small>Preferensi</small>
+            <strong>{halalLabels[place.halalStatus]}</strong>
+          </span>
+        </div>
+      </motion.section>
 
       <section className="detail-content-grid">
-        <div className="detail-main-column">
-          <div className="detail-host-row">
-            <div className="detail-host-row__copy">
-              <h2>{place.tagline}</h2>
-              <p>{halalLabels[place.halalStatus]} · {place.category} · {priceLabels[place.priceRange]}</p>
+        <main className="detail-main-column">
+          <motion.section
+            className="detail-card detail-overview-card"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: .2 }}
+            variants={reveal}
+          >
+            <div className="detail-section-heading">
+              <span className="detail-section-heading__icon"><Sparkles size={18} /></span>
+              <div>
+                <span className="section-kicker">MENGAPA LAYAK DICOBA</span>
+                <h2>Tentang tempat ini</h2>
+              </div>
             </div>
-            <span className="detail-host-row__avatar" aria-hidden="true">{place.emoji}</span>
-          </div>
-
-          <div className="detail-rating-hero">
-            <div className="detail-rating-hero__score">
-              <span className="detail-rating-hero__laurel" aria-hidden="true">❦</span>
-              <strong>{place.rating}</strong>
-              <span className="detail-rating-hero__laurel detail-rating-hero__laurel--flip" aria-hidden="true">❦</span>
-            </div>
-            <p className="detail-rating-hero__tagline">Disukai pengunjung</p>
-            <p className="detail-rating-hero__sub">Berdasarkan {place.reviewCount} ulasan komunitas terverifikasi</p>
-            <a className="text-link" href="#ulasan-komunitas">Lihat semua ulasan</a>
-          </div>
-
-          <div className="detail-section">
-            <h2 className="detail-section__title">Alasan untuk mampir</h2>
             <p className="detail-description">{place.description}</p>
             <ul className="detail-amenity-list">
               {place.highlights.map((highlight) => (
@@ -194,26 +293,56 @@ export function PlaceDetailPage() {
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.section>
 
-          <ReviewsSection placeId={place.id} onChanged={() => void loadPlace()} />
-          <BusinessClaimCard placeId={place.id} />
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: .08 }}
+            variants={reveal}
+          >
+            <ReviewsSection placeId={place.id} onChanged={() => void loadPlace()} />
+          </motion.div>
 
-          <div className="detail-report-actions">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: .1 }}
+            variants={reveal}
+          >
+            <BusinessClaimCard placeId={place.id} />
+          </motion.div>
+
+          <motion.div
+            className="detail-report-actions"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={reveal}
+          >
             <Flag size={13} aria-hidden="true" />
-            <span>Menemukan masalah?</span>
+            <span>Menemukan informasi yang kurang tepat?</span>
             <ReportContentButton entityType="place" entityId={place.id} entityLabel="tempat ini" />
             {heroPhoto && approvedPhotos.length > 0 && (
               <ReportContentButton variant="photo" entityType="place_photo" entityId={heroPhoto.id} entityLabel="foto tempat ini" />
             )}
-          </div>
-        </div>
+          </motion.div>
+        </main>
 
         <aside className="detail-side-column">
-          <div className="detail-sticky-card">
-            <div className="detail-sticky-card__price">
-              <span>{priceLabels[place.priceRange]}</span>
-              <small>per orang</small>
+          <motion.div
+            className="detail-sticky-card"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: .2 }}
+            variants={reveal}
+          >
+            <div className="detail-sticky-card__heading">
+              <span className="section-kicker">RENCANAKAN KUNJUNGAN</span>
+              <div className="detail-sticky-card__price">
+                <span>{priceLabels[place.priceRange]}</span>
+                <small>per orang</small>
+              </div>
             </div>
 
             <div className="detail-sticky-card__status">
@@ -223,20 +352,32 @@ export function PlaceDetailPage() {
               <span className="label-pill">{halalLabels[place.halalStatus]}</span>
             </div>
 
-            <a className="button button--primary button--full" href={routeUrl} target="_blank" rel="noreferrer">
-              <ExternalLink size={15} aria-hidden="true" /> Dapatkan rute
-            </a>
-            <button
+            <motion.a
+              className="button button--primary button--full"
+              href={routeUrl}
+              target="_blank"
+              rel="noreferrer"
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: .985 }}
+            >
+              <Navigation size={16} aria-hidden="true" /> Dapatkan rute
+            </motion.a>
+            <motion.button
               className={'button button--secondary button--full' + (isSaved ? ' is-saved' : '')}
               type="button"
               onClick={() => void handleFavoriteToggle()}
               disabled={favoritesLoading}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: .985 }}
             >
               <Heart size={15} fill={isSaved ? 'currentColor' : 'none'} aria-hidden="true" />
               {isSaved ? 'Tersimpan di favorit' : 'Simpan ke favorit'}
-            </button>
+            </motion.button>
 
-            <p className="detail-sticky-card__note">Gratis untuk dikunjungi — kamu hanya membayar apa yang kamu pesan.</p>
+            <div className="detail-sticky-card__trust">
+              <CheckCircle2 size={15} />
+              <span>Informasi dikurasi dan diperbarui bersama komunitas.</span>
+            </div>
 
             <div className="detail-info-list">
               <div className="detail-info-list__row">
@@ -281,27 +422,36 @@ export function PlaceDetailPage() {
                 </div>
               )}
             </div>
-          </div>
+          </motion.div>
 
-          <div className="detail-hours-card">
+          <motion.section
+            className="detail-hours-card"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: .2 }}
+            variants={reveal}
+          >
             <div className="detail-hours-card__heading">
-              <Clock3 size={16} aria-hidden="true" />
-              <h2>Jam buka</h2>
+              <span className="detail-hours-card__icon"><Clock3 size={17} aria-hidden="true" /></span>
+              <div>
+                <span className="section-kicker">WAKTU BERKUNJUNG</span>
+                <h2>Jam operasional</h2>
+              </div>
             </div>
             <div className="detail-hours-list">
               {dayOrder.map((day) => {
                 const hours = place.openingHours[day]
                 return (
-                  <div className="detail-hours-list__row" key={day}>
-                    <span>{dayLabels[day]}</span>
+                  <div className={'detail-hours-list__row' + (day === todayKey ? ' is-today' : '')} key={day}>
+                    <span>{dayLabels[day]}{day === todayKey && <small>Hari ini</small>}</span>
                     <strong className={hours.closed ? 'is-closed' : ''}>{hours.closed ? 'Tutup' : hours.open + ' – ' + hours.close}</strong>
                   </div>
                 )
               })}
             </div>
-          </div>
+          </motion.section>
         </aside>
       </section>
-    </div>
+    </motion.div>
   )
 }
